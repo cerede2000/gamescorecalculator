@@ -202,8 +202,6 @@ async function matchScreen(id) {
   const scopeOwners = f => (isTable(f) ? [TABLE] : st.participants.map(p => p.id))
   seed()
 
-  render()
-
   function nameOf(pid) { return st.participants.find(p => p.id === pid)?.name ?? pid }
 
   function render() {
@@ -227,6 +225,15 @@ async function matchScreen(id) {
   }
 
   // ── saisie ───────────────────────────────────────────────────────────────
+  /** Le compte des joueurs complets suit la frappe : un compteur figé à 0
+   *  pendant qu'on remplit ment sur ce qu'il mesure. */
+  const fill = el('span', { class: 'fill' })
+  function countFilled() {
+    const own = mode.inputs.filter(f => !isTable(f))
+    const n = st.participants.filter(p => own.every(f => !isUnknown(draft[p.id].values[f.id]))).length
+    fill.textContent = (perRound ? `Manche ${round} · ` : '') + `${n}/${st.participants.length} complets`
+  }
+
   function entry() {
     main.append(el('h2', {}, perRound ? `Saisie — manche ${round}` : 'Saisie'))
 
@@ -252,11 +259,7 @@ async function matchScreen(id) {
       main.append(el('div', { class: 'grid' }, st.participants.map(p => playerCard(p, own, cols))))
     }
 
-    const filled = st.participants.filter(p =>
-      mode.inputs.filter(f => !isTable(f)).every(f => !isUnknown(draft[p.id].values[f.id]))).length
-
-    bar(el('span', { class: 'fill' },
-        perRound ? `Manche ${round} · ${filled}/${st.participants.length} complets` : `${filled}/${st.participants.length} complets`),
+    bar(fill,
       perRound && round > 1
         ? el('button', { class: 'btn ghost', onclick: () => { round--; seed(); render() } }, '‹ manche précédente')
         : null,
@@ -265,6 +268,7 @@ async function matchScreen(id) {
         ? el('button', { class: 'btn', onclick: () => save().then(() => { round++; seed(); render() }) }, 'Manche suivante')
         : null,
       el('button', { class: 'btn primary', onclick: () => save().then(finish) }, 'Terminer la partie'))
+    countFilled()
   }
 
   /** Les collections d'une page : celles qui alimentent une dérivation
@@ -292,7 +296,7 @@ async function matchScreen(id) {
       cols.map(c => el('div', { class: 'field' },
         el('span', { class: 'lab' }, c.label),
         c.help ? el('span', { class: 'help' }, c.help) : null,
-        collectionControl(c, draft[p.id].collections[c.id] ?? [], items => { draft[p.id].collections[c.id] = items }))))
+        collectionControl(c, draft[p.id].collections[c.id] ?? [], items => { draft[p.id].collections[c.id] = items; countFilled() }))))
   }
 
   function fieldRow(f, owner) {
@@ -300,7 +304,7 @@ async function matchScreen(id) {
       el('span', { class: 'lab' }, f.label,
         f.required ? el('span', { class: 'tiny', style: 'color:var(--wood);font-weight:400' }, ' — requis') : null),
       f.help ? el('span', { class: 'help' }, f.help) : null,
-      fieldControl(f, draft[owner].values[f.id] ?? null, v => { draft[owner].values[f.id] = v }))
+      fieldControl(f, draft[owner].values[f.id] ?? null, v => { draft[owner].values[f.id] = v; countFilled() }))
   }
 
   async function save() {
@@ -340,7 +344,8 @@ async function matchScreen(id) {
               el('td', {}, el('div', {}, l.label),
                 l.formula === show(l.value) ? null : el('div', { class: 'f' }, l.formula)),
               el('td', { class: 'v' + (isUnknown(l.value) ? ' unknown' : '') }, show(l.value))))))),
-          rep.excluded ? el('div', { class: 'tiny muted', style: 'margin-top:6px' }, rep.excluded) : null,
+          rep.excluded ? el('div', { class: 'tiny muted', style: 'margin-top:6px' },
+            'Cette règle écarte toutes les autres lignes au lieu de les additionner à zéro.') : null,
           el('div', { class: 'total' },
             el('span', { class: 'tiny muted' }, 'Total'),
             el('span', { class: 'n' + (isUnknown(rep.total) ? ' unknown' : '') }, show(rep.total))))
@@ -447,6 +452,9 @@ async function matchScreen(id) {
           : null,
         p.source ? el('p', { style: 'margin:4px 0 0', class: 'muted' }, p.source) : null))))
   }
+
+  // premier rendu, une fois toutes les déclarations en place
+  render()
 }
 
 function bar(...kids) {

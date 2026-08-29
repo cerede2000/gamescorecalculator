@@ -7,7 +7,7 @@
   "f7.x2":                     "Carte ×2",
   "f7.x2.help":                "Elle double la somme des cartes numéro, pas les bonus.",
   "f7.bonusSum":               "Bonus",
-  "f7.bonusSum.help":          "La somme des cartes bonus. L'ensemble fermé +2 à +10 décrit les cartes, pas leur somme : deux cartes font 6, aucune fait 0.",
+  "f7.bonusSum.help":          "La somme de vos cartes bonus. Aucune carte bonus : 0.",
   "f7.flip7":                  "Flip 7",
   "f7.cards":                  "Cartes numéro retournées",
   "f7.cards.help":             "Une pastille par carte. Sept valeurs distinctes déclenchent le Flip 7.",
