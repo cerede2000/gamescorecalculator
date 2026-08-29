@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 348 contrôles, aucune dépendance :
+Cinq portes, 351 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
@@ -151,7 +151,7 @@ du noyau à la volée et le sert au navigateur sous `/core/`, ce qui évite d'en
 | Akropolis | 2 à 4 | 16 champs par joueur | Pierres, puis victoire partagée |
 | Moon Colony Bloodbath | 1 à 5 | 2 champs par joueur | aucun → victoire partagée |
 | Dune: Imperium | 1 à 4 | 1 champ par joueur | Épice, Solaris, Eau, Troupes |
-| Ark Nova | 1 à 4 | 2 champs par joueur | projets de conservation, puis victoire partagée |
+| Ark Nova | 1 à 4 | 2 champs par joueur, 1 facultatif | projets de conservation, puis victoire partagée |
 
 Règles vérifiées contre les livrets officiels, sauf Flip 7 dont seule une
 synthèse de deux pages est disponible.
@@ -164,12 +164,17 @@ livret demande de faire, et c'est tout le décompte. L'exemple du livret est
 une partie de référence : 24+80 = 104 contre 30+78 = 108, et le joueur qui a
 deux points d'attrait de moins l'emporte.
 
-Une réserve y est déclarée plutôt que comblée : la table complète de la piste
-de conservation n'est pas dans le livret, qui n'en montre que deux points. Les
-images du PDF sont en 150 ppi et le plateau y tient en quelques centaines de
-pixels : la table n'y est pas récupérable, ce n'est pas une question de zoom.
-L'application demande donc la valeur lue sur le plateau au lieu de la position
-du marqueur, et la question reste affichée dans la partie.
+Une réserve y est déclarée plutôt que comblée : la table des **valeurs** de la
+piste de conservation n'est pas dans le livret, qui n'en montre que deux
+points. L'application demande donc la valeur lue sur le plateau au lieu de la
+position du marqueur, et la question reste affichée dans la partie.
+
+L'**alignement des zones**, lui, est relevé sur le plateau : 33 zones couvrant
+l'attrait 0 à 113, par groupes de 1, 2, 3, 4, 5 puis 6 cases. Un champ
+facultatif — le numéro de la case de conservation — permet à l'application de
+vérifier après coup que la fin de partie était bien déclenchée, c'est-à-dire
+que les deux marqueurs se sont rejoints ou croisés. Les trois exemples du
+livret passent ce contrôle ; une combinaison impossible est signalée.
 
 ## Ce qu'il y a dans le dépôt
 

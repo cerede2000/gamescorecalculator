@@ -122,7 +122,10 @@ export function validate(b: Bundle): Issue[] {
     ...eng.contributions.map(c => `formula:${c.code}`),
     ...(eng.endConditions ?? []).map(e => `end:${e.code}`),
     ...eng.ranking.criteria.map(c => `ranking:${c.metric}`),
-    ...(eng.tieBreakers ?? []).map(c => `tiebreak:${c.metric}`)
+    ...(eng.tieBreakers ?? []).map(c => `tiebreak:${c.metric}`),
+    // un champ peut n'exister que pour un AVIS : il ne pèse sur aucun score,
+    // mais il permet de dire quelque chose de vrai sur la partie
+    ...(eng.notices ?? []).map(n => `notice:${n.code}`)
   ])
 
   const allDeriveTargets = new Set(eng.modes.flatMap(m => (m.derive ?? []).map(d => `derive:${d.id}`)))

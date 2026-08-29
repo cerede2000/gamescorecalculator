@@ -397,6 +397,27 @@ section('Ark Nova : la conservation devant l\'attrait')
   })
   ok('deux questions ont suffi', st.ranking.questionsAsked === 2 && st.ranking.standings[0].id === 'bo')
 
+  // les zones de décompte, relevées sur le plateau
+  const zone = async (appeal: number, conservation: number, caseConservation: number) => {
+    let z = await call('POST', '/api/matches', {
+      gameId: 'ark-nova', mode: 'express', players: [{ id: 'p', name: 'P' }]
+    })
+    z = await call('PUT', `/api/matches/${z.match.id}/rounds/1`, {
+      expectedVersion: z.match.version,
+      inputs: { p: { values: { appeal, conservationValue: conservation, conservationCase: caseConservation } } }
+    })
+    return z.gameNotices.map((n: any) => n.code)
+  }
+  ok('les trois exemples du livret : la fin était bien déclenchée',
+     (await zone(80, 24, 16)).includes('endReached') &&
+     (await zone(78, 30, 18)).includes('endReached') &&
+     (await zone(64, 28, 20)).includes('endReached'))
+  ok('une combinaison impossible est signalée',
+     (await zone(20, 40, 30)).includes('endNotReached'))
+  const sansCase = await play([{ id: 'solo', appeal: 80, conservation: 24 }])
+  ok('le champ reste facultatif : rien n\'est dit sans lui',
+     !sansCase.gameNotices.some((n: any) => n.code.startsWith('end')))
+
   // le seuil solo
   const gagne = await play([{ id: 'solo', appeal: 78, conservation: 24 }])
   ok('solo à 102 : la victoire est annoncée',

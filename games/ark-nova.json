@@ -29,7 +29,7 @@
       "provisional": "readFromBoard",
       "affectsScore": false,
       "source": null,
-      "rationale": "Faute de table, l'application demande la valeur en blanc plutôt que la position du marqueur — ce que le livret demande déjà au joueur de faire."
+      "rationale": "Faute de table des valeurs, l'application demande la valeur en blanc plutôt que la position du marqueur. L'alignement des zones, lui, est relevé sur le plateau et sert à vérifier la fin de partie."
     },
     {
       "id": "finalTiebreak",
@@ -47,8 +47,8 @@
     {
       "id": "endTrigger",
       "kind": "productScope",
-      "text": "La fin de partie se déclenche quand vos marqueurs de conservation et d'attrait se trouvent dans la même zone de décompte ou se sont croisés. Cette zone se lit sur le plateau ; l'application ne la modélise pas et ne prévient donc pas de la fin. Elle compte quand la partie est finie.",
-      "source": "livret p.19 : « La zone de décompte est l'espace formé par une case de la piste de conservation et toutes les cases de la piste d'attrait qui lui sont associées »"
+      "text": "La fin de partie se déclenche quand vos marqueurs de conservation et d'attrait se rejoignent ou se croisent. L'application ne suit pas la partie et ne peut donc pas vous prévenir sur le moment ; en revanche, si vous saisissez le numéro de votre case de conservation, elle vérifie après coup que la fin était bien déclenchée.",
+      "source": "livret p.19, et alignement des zones relevé sur le plateau"
     }
   ],
   "setupAssistant": {
@@ -331,7 +331,7 @@
   },
   "ui": {
     "layout": "playerGrid",
-    "fieldsPerPlayer": 2
+    "fieldsPerPlayer": 3
   },
   "scoringEngine": {
     "modes": [
@@ -360,6 +360,17 @@
             "required": true,
             "usedBy": "formula:final.conservation",
             "help": "i18n:an.conservationValue.help"
+          },
+          {
+            "id": "conservationCase",
+            "label": "i18n:an.conservationCase",
+            "type": "INTEGER",
+            "min": 0,
+            "max": 37,
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "notice:endReached",
+            "help": "i18n:an.conservationCase.help"
           }
         ]
       }
@@ -460,6 +471,512 @@
           ]
         },
         "source": "livret p.19, mode solo"
+      },
+      {
+        "code": "endReached",
+        "label": "i18n:an.notice.endReached",
+        "level": "info",
+        "when": {
+          "op": "gte",
+          "left": {
+            "op": "bracket",
+            "input": {
+              "op": "ref",
+              "id": "appeal"
+            },
+            "table": [
+              {
+                "upTo": 0,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "5"
+                }
+              },
+              {
+                "upTo": 1,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "6"
+                }
+              },
+              {
+                "upTo": 2,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "7"
+                }
+              },
+              {
+                "upTo": 3,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "8"
+                }
+              },
+              {
+                "upTo": 4,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "9"
+                }
+              },
+              {
+                "upTo": 6,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "10"
+                }
+              },
+              {
+                "upTo": 8,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "11"
+                }
+              },
+              {
+                "upTo": 10,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "12"
+                }
+              },
+              {
+                "upTo": 12,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "13"
+                }
+              },
+              {
+                "upTo": 14,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "14"
+                }
+              },
+              {
+                "upTo": 16,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "15"
+                }
+              },
+              {
+                "upTo": 19,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "16"
+                }
+              },
+              {
+                "upTo": 22,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "17"
+                }
+              },
+              {
+                "upTo": 25,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "18"
+                }
+              },
+              {
+                "upTo": 28,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "19"
+                }
+              },
+              {
+                "upTo": 31,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "20"
+                }
+              },
+              {
+                "upTo": 35,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "21"
+                }
+              },
+              {
+                "upTo": 39,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "22"
+                }
+              },
+              {
+                "upTo": 43,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "23"
+                }
+              },
+              {
+                "upTo": 47,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "24"
+                }
+              },
+              {
+                "upTo": 51,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "25"
+                }
+              },
+              {
+                "upTo": 55,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "26"
+                }
+              },
+              {
+                "upTo": 60,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "27"
+                }
+              },
+              {
+                "upTo": 65,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "28"
+                }
+              },
+              {
+                "upTo": 70,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "29"
+                }
+              },
+              {
+                "upTo": 75,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "30"
+                }
+              },
+              {
+                "upTo": 80,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "31"
+                }
+              },
+              {
+                "upTo": 85,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "32"
+                }
+              },
+              {
+                "upTo": 90,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "33"
+                }
+              },
+              {
+                "upTo": 95,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "34"
+                }
+              },
+              {
+                "upTo": 101,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "35"
+                }
+              },
+              {
+                "upTo": 107,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "36"
+                }
+              },
+              {
+                "upTo": 113,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "37"
+                }
+              }
+            ]
+          },
+          "right": {
+            "op": "ref",
+            "id": "conservationCase"
+          }
+        },
+        "source": "livret p.19 : « votre marqueur de conservation et votre marqueur d'attrait se trouvent dans la même zone de décompte ou se sont croisés » ; alignement des zones relevé sur le plateau"
+      },
+      {
+        "code": "endNotReached",
+        "label": "i18n:an.notice.endNotReached",
+        "level": "warn",
+        "when": {
+          "op": "lt",
+          "left": {
+            "op": "bracket",
+            "input": {
+              "op": "ref",
+              "id": "appeal"
+            },
+            "table": [
+              {
+                "upTo": 0,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "5"
+                }
+              },
+              {
+                "upTo": 1,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "6"
+                }
+              },
+              {
+                "upTo": 2,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "7"
+                }
+              },
+              {
+                "upTo": 3,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "8"
+                }
+              },
+              {
+                "upTo": 4,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "9"
+                }
+              },
+              {
+                "upTo": 6,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "10"
+                }
+              },
+              {
+                "upTo": 8,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "11"
+                }
+              },
+              {
+                "upTo": 10,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "12"
+                }
+              },
+              {
+                "upTo": 12,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "13"
+                }
+              },
+              {
+                "upTo": 14,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "14"
+                }
+              },
+              {
+                "upTo": 16,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "15"
+                }
+              },
+              {
+                "upTo": 19,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "16"
+                }
+              },
+              {
+                "upTo": 22,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "17"
+                }
+              },
+              {
+                "upTo": 25,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "18"
+                }
+              },
+              {
+                "upTo": 28,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "19"
+                }
+              },
+              {
+                "upTo": 31,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "20"
+                }
+              },
+              {
+                "upTo": 35,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "21"
+                }
+              },
+              {
+                "upTo": 39,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "22"
+                }
+              },
+              {
+                "upTo": 43,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "23"
+                }
+              },
+              {
+                "upTo": 47,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "24"
+                }
+              },
+              {
+                "upTo": 51,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "25"
+                }
+              },
+              {
+                "upTo": 55,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "26"
+                }
+              },
+              {
+                "upTo": 60,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "27"
+                }
+              },
+              {
+                "upTo": 65,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "28"
+                }
+              },
+              {
+                "upTo": 70,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "29"
+                }
+              },
+              {
+                "upTo": 75,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "30"
+                }
+              },
+              {
+                "upTo": 80,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "31"
+                }
+              },
+              {
+                "upTo": 85,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "32"
+                }
+              },
+              {
+                "upTo": 90,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "33"
+                }
+              },
+              {
+                "upTo": 95,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "34"
+                }
+              },
+              {
+                "upTo": 101,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "35"
+                }
+              },
+              {
+                "upTo": 107,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "36"
+                }
+              },
+              {
+                "upTo": 113,
+                "value": {
+                  "type": "INTEGER",
+                  "value": "37"
+                }
+              }
+            ]
+          },
+          "right": {
+            "op": "ref",
+            "id": "conservationCase"
+          }
+        },
+        "source": "idem"
       }
     ],
     "ranking": {
