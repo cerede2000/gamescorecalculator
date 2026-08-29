@@ -408,6 +408,58 @@ section('Ark Nova : la conservation devant l\'attrait')
   ok('à deux, aucun avis solo', duo.gameNotices.length === 0, JSON.stringify(duo.gameNotices))
 }
 
+section('Mise en place : les quantités suivent la table')
+{
+  const sheet = (game: string, players: number) => call('GET', `/api/games/${game}/setup?players=${players}`)
+  const qty = (sh: any, step: string, label: string) =>
+    sh.steps.find((s: any) => s.id === step)?.quantities.find((q: any) => q.label === label)
+
+  for (const [n, tuiles, parPile, chantier] of [[2, 37, 3, 4], [3, 49, 4, 5], [4, 61, 5, 6]] as const) {
+    const sh = await sheet('akropolis', n)
+    ok(`Akropolis à ${n} : ${tuiles} tuiles, ${parPile} par pile, ${chantier} au Chantier`,
+       qty(sh, 'tiles', 'Tuiles en jeu')?.value === tuiles &&
+       qty(sh, 'piles', 'Tuiles par pile')?.value === parPile &&
+       qty(sh, 'chantier', 'Tuiles au Chantier')?.value === chantier)
+  }
+  const ak4 = await sheet('akropolis', 4)
+  ok('les Pierres suivent l\'ordre du tour : 1, 2, 3, 4',
+     JSON.stringify(qty(ak4, 'stones', 'Pierres')?.bySeat) === '[1,2,3,4]')
+  const ak2 = await sheet('akropolis', 2)
+  ok('et se limitent aux sièges occupés',
+     JSON.stringify(qty(ak2, 'stones', 'Pierres')?.bySeat) === '[1,2]')
+
+  const solo = await sheet('ark-nova', 1)
+  const table = await sheet('ark-nova', 4)
+  ok('Ark Nova solo : pas de pion Pause, mais la tuile Solo',
+     solo.steps.some((s: any) => s.id === 'boardSolo') && !solo.steps.some((s: any) => s.id === 'board'))
+  ok('Ark Nova à quatre : le pion Pause, pas la tuile Solo',
+     table.steps.some((s: any) => s.id === 'board') && !table.steps.some((s: any) => s.id === 'boardSolo'))
+  ok('attrait de départ dans l\'ordre du tour : 0, 1, 2, 3',
+     JSON.stringify(qty(table, 'markers', 'Attrait de départ')?.bySeat) === '[0,1,2,3]')
+  ok('et 20 en solo', qty(solo, 'markersSolo', 'Attrait de départ conseillé')?.value === 20)
+
+  const du4 = await sheet('dune-imperium', 4)
+  const du3 = await sheet('dune-imperium', 3)
+  ok('Dune : le disque de Score démarre sur 1 à quatre joueurs, sur 0 sinon',
+     qty(du4, 'score', 'Point de départ')?.value === 1 && qty(du3, 'score', 'Point de départ')?.value === 0)
+  const du2 = await sheet('dune-imperium', 2)
+  ok('Dune à deux : hors périmètre, et l\'écran dit pourquoi',
+     du2.available === false && typeof du2.notice === 'string' && du2.notice.length > 0)
+
+  const mcb = await sheet('moon-colony-bloodbath', 3)
+  ok('Moon Colony : aucune fiche, et le motif est affiché',
+     mcb.available === false && (mcb.notice ?? '').includes('livret'))
+
+  // toute étape publiée cite sa source
+  const { readFileSync } = await import('node:fs')
+  let sans = 0, total = 0
+  for (const f of readdirSync('games')) {
+    const b = JSON.parse(readFileSync(`games/${f}`, 'utf8'))
+    for (const st of b.setupAssistant?.steps ?? []) { total++; if (!st.source) sans++ }
+  }
+  ok(`${total} étapes publiées, toutes sourcées`, sans === 0, `${sans} sans source`)
+}
+
 section('Revenir sur une manche')
 {
   const mk = () => call('POST', '/api/matches', {

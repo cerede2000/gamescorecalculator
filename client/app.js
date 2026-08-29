@@ -23,7 +23,8 @@ const routes = [
   [/^\/?$/,                    home],
   [/^\/nouveau$/,              catalogue],
   [/^\/nouveau\/([\w-]+)$/,    setupScreen],
-  [/^\/partie\/([\w-]+)$/,     matchScreen]
+  [/^\/partie\/([\w-]+)$/,     matchScreen],
+  [/^\/partie\/([\w-]+)\/mise-en-place$/, setupSheet]
 ]
 
 async function route() {
@@ -172,7 +173,8 @@ async function setupScreen(gameId) {
             gameId, mode: mode.id, label: gname(game),
             players: Array.from({ length: count }, (_, i) => ({ id: `p${i + 1}`, name: names[i] || `Joueur ${i + 1}` }))
           })
-          go(`/partie/${st.match.id}`)
+          const sheet = await api.setup(st.match.id).catch(() => ({ available: false }))
+          go(sheet.available ? `/partie/${st.match.id}/mise-en-place` : `/partie/${st.match.id}`)
         } catch (err) { e.target.disabled = false; toast(err.message, true) }
       } }, 'Commencer'))
 }
@@ -181,6 +183,7 @@ async function setupScreen(gameId) {
 async function matchScreen(id) {
   let st = await api.match(id)
   const game = await api.game(st.match.gameId)
+  const setupAvailable = (await api.setup(id).catch(() => ({ available: false }))).available
   const mode = game.scoringEngine.modes.find(m => m.id === st.match.mode)
   const perRound = mode.inputs.some(f => f.scope === 'PARTICIPANT_ROUND' || f.scope === 'ROUND')
 
@@ -234,6 +237,10 @@ async function matchScreen(id) {
     if (st.game.setupOutOfScope)
       main.append(el('div', { class: 'note tiny', style: 'margin-top:10px' }, st.game.setupOutOfScope))
 
+    if (st.match.status === 'open' && setupAvailable)
+      main.append(el('div', { class: 'row', style: 'margin-top:14px' },
+        el('button', { class: 'btn sm ghost', onclick: () => go(`/partie/${id}/mise-en-place`) },
+          'Revoir la mise en place')))
     if (st.match.status === 'open') entry()
     results()
     if (st.match.status === 'finished') verdict()
@@ -597,6 +604,75 @@ async function matchScreen(id) {
 
   // premier rendu, une fois toutes les déclarations en place
   render()
+}
+
+// ── mise en place ──────────────────────────────────────────────────────────
+async function setupSheet(id) {
+  const [sheet, st] = await Promise.all([api.setup(id), api.match(id)])
+  trail(st.game.name, 'mise en place')
+
+  main.append(
+    el('h1', {}, 'Mise en place'),
+    el('p', { class: 'lede' },
+      `${st.game.name} · ${sheet.participants.length} joueur${sheet.participants.length > 1 ? 's' : ''}`))
+
+  if (!sheet.available) {
+    main.append(el('div', { class: 'note', style: 'margin-top:16px' },
+      el('p', { style: 'margin:0' }, sheet.notice || 'Aucune fiche n\'est rédigée pour cette configuration.')))
+    bar(el('button', { class: 'btn primary', onclick: () => go(`/partie/${id}`) }, 'Aller à la saisie'))
+    return
+  }
+
+  main.append(el('p', { class: 'tiny muted' },
+    'Les quantités ci-dessous sont déjà ajustées à votre table.'))
+
+  // les coches ne valent que pour cet appareil et cette partie : c'est un
+  // rituel de début de partie, pas une donnée de la partie
+  const key = `tablee.setup.${id}`
+  const done = new Set(read())
+  function read() { try { return JSON.parse(localStorage.getItem(key) ?? '[]') } catch { return [] } }
+  function write() { try { localStorage.setItem(key, JSON.stringify([...done])) } catch {} }
+
+  const progress = el('span', { class: 'fill' })
+  const tell = () => { progress.textContent = `${done.size}/${sheet.steps.length} étapes` }
+
+  const list = el('ol', { class: 'steps' })
+  sheet.steps.forEach((s, i) => {
+    const input = el('input', {
+      type: 'checkbox', checked: done.has(s.id),
+      onchange: e => {
+        e.target.checked ? done.add(s.id) : done.delete(s.id)
+        write(); tell()
+        li.classList.toggle('done', e.target.checked)
+      }
+    })
+    const li = el('li', { class: 'step' + (done.has(s.id) ? ' done' : '') },
+      el('label', { class: 'step-head' }, input,
+        el('span', {},
+          el('span', { class: 'step-scope' }, s.scope === 'TABLE' ? 'Table' : 'Chaque joueur'),
+          el('span', { class: 'step-title' }, s.title))),
+      s.body ? el('p', { class: 'step-body' }, s.body) : null,
+      s.quantities.length ? el('div', { class: 'qties' }, s.quantities.map(q =>
+        q.bySeat
+          ? el('div', { class: 'qty seats' },
+              el('span', { class: 'q-label' }, q.label),
+              el('span', { class: 'q-seats' }, q.bySeat.map((v, k) =>
+                el('span', { class: 'seat' },
+                  el('span', { class: 'seat-name' }, sheet.participants[k]?.name ?? `Joueur ${k + 1}`),
+                  el('span', { class: 'seat-v num' }, String(v))))))
+          : el('div', { class: 'qty' },
+              el('span', { class: 'q-label' }, q.label),
+              el('span', { class: 'q-value num' },
+                q.value === null ? '—' : String(q.value), q.unit ? ' ' + q.unit : '')))) : null,
+      s.source ? el('div', { class: 'step-src' }, s.source) : null)
+    list.append(li)
+  })
+  main.append(list)
+  tell()
+
+  bar(progress,
+    el('button', { class: 'btn ghost', onclick: () => { done.clear(); write(); route() } }, 'Tout décocher'),
+    el('button', { class: 'btn primary', onclick: () => go(`/partie/${id}`) }, 'La table est prête'))
 }
 
 function bar(...kids) {

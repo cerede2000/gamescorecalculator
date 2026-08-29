@@ -511,5 +511,28 @@
     "flip7-guided",
     "flip7-threshold",
     "flip7-busted"
-  ]
+  ],
+  "setupAssistant": {
+    "enabled": true,
+    "steps": [
+      {
+        "id": "shuffle",
+        "scope": "TABLE",
+        "source": "synthèse des règles fournie, 2026-08-29",
+        "title": "Mélanger les cartes"
+      },
+      {
+        "id": "deal",
+        "scope": "PER_PLAYER",
+        "source": "synthèse des règles fournie, 2026-08-29",
+        "title": "Recevoir une carte face visible",
+        "quantities": [
+          {
+            "label": "Carte de départ",
+            "value": 1
+          }
+        ]
+      }
+    ]
+  }
 }

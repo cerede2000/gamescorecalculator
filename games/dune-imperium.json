@@ -57,7 +57,197 @@
       "min": 3,
       "max": 4
     },
-    "outOfScopeNotice": "i18n:du.setup.outOfScope"
+    "outOfScopeNotice": "i18n:du.setup.outOfScope",
+    "steps": [
+      {
+        "id": "board",
+        "scope": "TABLE",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Disposer le plateau et son matériel",
+        "body": "Couchez le Mentat sur son emplacement. Placez les quatre jetons Alliance sur les zones des pistes Influence marquées du symbole de leur Faction : Empereur, Guilde Spatiale, Bene Gesserit et Fremen.",
+        "quantities": [
+          {
+            "label": "Jetons Alliance",
+            "value": 4
+          }
+        ]
+      },
+      {
+        "id": "conflicts",
+        "scope": "TABLE",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Constituer le deck Conflit",
+        "body": "Séparez les Conflits selon leur dos. Mélangez les 4 cartes Conflit III et placez-les toutes face cachée sur la zone du plateau. Mélangez les 10 cartes Conflit II et placez-en 5 par-dessus. Mélangez les 4 cartes Conflit I et placez-en une par-dessus. Remettez les cartes inutilisées dans la boîte sans les consulter.",
+        "quantities": [
+          {
+            "label": "Deck final",
+            "value": 10,
+            "unit": "cartes"
+          },
+          {
+            "label": "Conflit I",
+            "value": 1
+          },
+          {
+            "label": "Conflit II",
+            "value": 5
+          },
+          {
+            "label": "Conflit III",
+            "value": 4
+          }
+        ]
+      },
+      {
+        "id": "decks",
+        "scope": "TABLE",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Préparer les cartes le long du plateau",
+        "body": "Mélangez le deck Intrigue et placez-le face cachée. Mélangez le deck Imperium, placez-le face cachée et piochez-y cinq cartes alignées face visible : la Rangée Imperium. Placez les cartes Réserve en trois piles à côté : Contact d'Arrakis, L'Épice Doit Couler, Espace Plissé.",
+        "quantities": [
+          {
+            "label": "Rangée Imperium",
+            "value": 5,
+            "unit": "cartes"
+          },
+          {
+            "label": "Piles Réserve",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "id": "leader",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Choisir un Dirigeant",
+        "body": "Pour une première partie, il est conseillé de choisir un Dirigeant n'ayant qu'une seule icône : Paul Atréides, Glossu « La Bête » Rabban, Comte Memnon Thorvald ou Comte Ilban Richèse."
+      },
+      {
+        "id": "startDeck",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Prendre son deck de départ",
+        "body": "Dix cartes, mélangées et placées face cachée dans sa réserve, à gauche de son Dirigeant.",
+        "quantities": [
+          {
+            "label": "Cartes de départ",
+            "value": 10,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "water",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Prendre 1 eau",
+        "quantities": [
+          {
+            "label": "Eau",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "bank",
+        "scope": "TABLE",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Créer la banque",
+        "body": "Les jetons Solari, Épice et Eau restants. Ils ne sont pas considérés comme limités : s'il en manque, utilisez le substitut de votre choix."
+      },
+      {
+        "id": "agents",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Placer ses Agents",
+        "body": "Deux Agents sur votre Dirigeant. Le troisième, votre Maître d'Armes, à côté du plateau.",
+        "quantities": [
+          {
+            "label": "Agents sur le Dirigeant",
+            "value": 2
+          },
+          {
+            "label": "Maître d'Armes",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "score",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Placer son disque sur la piste de Score",
+        "body": "À quatre joueurs, il démarre sur le 1 ; sinon sur le 0.",
+        "quantities": [
+          {
+            "label": "Point de départ",
+            "valueExpr": {
+              "op": "bracket",
+              "input": {
+                "op": "ref",
+                "id": "playerCount"
+              },
+              "table": [
+                {
+                  "upTo": 3,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "0"
+                  }
+                },
+                {
+                  "from": 4,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "1"
+                  }
+                }
+              ]
+            },
+            "unit": "point de victoire"
+          }
+        ]
+      },
+      {
+        "id": "combat",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Placer son marqueur Combat sur le 0"
+      },
+      {
+        "id": "influence",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Placer un cube au bas de chaque piste d'Influence",
+        "quantities": [
+          {
+            "label": "Cubes d'influence",
+            "value": 4,
+            "unit": "cubes"
+          }
+        ]
+      },
+      {
+        "id": "troops",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel jeu de base FR, p. 4-5",
+        "title": "Placer ses troupes en garnison",
+        "body": "Les 12 autres cubes représentent vos troupes. Placez-en trois dans celle des quatre garnisons circulaires du plateau dont vous êtes le plus proche — une garnison par joueur.",
+        "quantities": [
+          {
+            "label": "Troupes en garnison",
+            "value": 3,
+            "unit": "cubes"
+          },
+          {
+            "label": "Cubes en réserve",
+            "value": 9,
+            "unit": "cubes"
+          }
+        ]
+      }
+    ]
   },
   "ui": {
     "layout": "playerGrid",

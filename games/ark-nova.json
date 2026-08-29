@@ -2,16 +2,30 @@
   "gameId": "ark-nova",
   "version": "1.0.0",
   "contract": "1.0",
-  "name": { "fr": "Ark Nova", "en": "Ark Nova" },
-  "rulesVersion": { "label": "livret officiel FR, impression 05/2023 v2.0", "confirmed": true },
-  "playerCountRules": { "min": 1, "max": 4 },
-  "locales": ["fr"],
+  "name": {
+    "fr": "Ark Nova",
+    "en": "Ark Nova"
+  },
+  "rulesVersion": {
+    "label": "livret officiel FR, impression 05/2023 v2.0",
+    "confirmed": true
+  },
+  "playerCountRules": {
+    "min": 1,
+    "max": 4
+  },
+  "locales": [
+    "fr"
+  ],
   "policies": [
     {
       "id": "conservationTrackTable",
       "status": "unconfirmed",
       "question": "Quelle est la table complète de la piste de conservation, case par case, jusqu'à sa valeur en blanc ? Le livret n'en montre que deux points : la case 16 vaut 24, la case 18 vaut 30.",
-      "options": ["readFromBoard", "fullTable"],
+      "options": [
+        "readFromBoard",
+        "fullTable"
+      ],
       "provisional": "readFromBoard",
       "affectsScore": false,
       "source": null,
@@ -20,7 +34,9 @@
     {
       "id": "finalTiebreak",
       "status": "confirmed",
-      "options": ["conservationProjects"],
+      "options": [
+        "conservationProjects"
+      ],
       "provisional": "conservationProjects",
       "affectsScore": false,
       "source": "livret p.19 : « le joueur ex-aequo qui a soutenu le plus de projets de conservation l'emporte […] S'il y a encore égalité, la victoire est partagée »",
@@ -35,8 +51,288 @@
       "source": "livret p.19 : « La zone de décompte est l'espace formé par une case de la piste de conservation et toutes les cases de la piste d'attrait qui lui sont associées »"
     }
   ],
-  "setupAssistant": { "enabled": true },
-  "ui": { "layout": "playerGrid", "fieldsPerPlayer": 2 },
+  "setupAssistant": {
+    "enabled": true,
+    "steps": [
+      {
+        "id": "board",
+        "scope": "TABLE",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "when": {
+          "op": "gt",
+          "left": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "1"
+            }
+          }
+        },
+        "title": "Poser le plateau et le pion Pause",
+        "body": "Le pion Pause va sur la case de départ de la piste correspondant à votre nombre de joueurs."
+      },
+      {
+        "id": "boardSolo",
+        "scope": "TABLE",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 19, mode solo",
+        "when": {
+          "op": "eq",
+          "left": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "1"
+            }
+          }
+        },
+        "title": "Poser le plateau — sans pion Pause",
+        "body": "En solo, on n'utilise pas le pion Pause. Placez à la place 7 cubes Joueur d'une couleur non utilisée dans les cases de la colonne de gauche de la tuile Solo.",
+        "quantities": [
+          {
+            "label": "Cubes sur la tuile Solo",
+            "value": 7,
+            "unit": "cubes"
+          }
+        ]
+      },
+      {
+        "id": "conservationSolo",
+        "scope": "TABLE",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 19, mode solo",
+        "when": {
+          "op": "eq",
+          "left": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "1"
+            }
+          }
+        },
+        "title": "Placer 3 cartes Projet de conservation de base",
+        "body": "Sans aucun cube Joueur dessus, comme dans une partie à 3 joueurs.",
+        "quantities": [
+          {
+            "label": "Projets de conservation",
+            "value": 3,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "bonusTiles",
+        "scope": "TABLE",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Répartir les tuiles Bonus",
+        "body": "Mélangez les 9 tuiles Bonus et placez-en une au hasard, face visible, sur chacune des 4 cases jaunes vides du plateau. Ne placez rien sur les 2 cases jaunes marquées d'une icône. Rangez les 5 tuiles restantes.",
+        "quantities": [
+          {
+            "label": "Tuiles à placer",
+            "value": 4,
+            "unit": "tuiles"
+          },
+          {
+            "label": "Tuiles rangées",
+            "value": 5,
+            "unit": "tuiles"
+          }
+        ]
+      },
+      {
+        "id": "zooDeck",
+        "scope": "TABLE",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Constituer la pioche et la rivière",
+        "body": "Mélangez les cartes Zoo pour former la pioche face cachée. Prenez les 6 premières cartes et placez-les face cachée sur les emplacements de la rivière ; vous les révélerez à la fin de la mise en place.",
+        "quantities": [
+          {
+            "label": "Cartes de la rivière",
+            "value": 6,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "zooBoard",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Prendre un plateau Zoo A, face visible",
+        "body": "Les 4 plateaux Zoo A sont identiques et pensés pour découvrir le jeu. Les 4 autres, marqués Plateau 0, sont eux aussi identiques et utilisables dès la deuxième partie."
+      },
+      {
+        "id": "actionCards",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Placer ses 5 cartes Action, niveau 1 visible",
+        "body": "La carte Animaux occupe le premier emplacement. Les quatre autres sont placées au hasard.",
+        "quantities": [
+          {
+            "label": "Cartes Action",
+            "value": 5,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "markers",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "when": {
+          "op": "gt",
+          "left": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "1"
+            }
+          }
+        },
+        "title": "Placer ses marqueurs au début des pistes",
+        "body": "Attrait, conservation et réputation. Sur la piste d'attrait, les joueurs se placent dans l'ordre du tour.",
+        "quantities": [
+          {
+            "label": "Attrait de départ",
+            "bySeat": [
+              0,
+              1,
+              2,
+              3
+            ]
+          }
+        ]
+      },
+      {
+        "id": "markersSolo",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 19, mode solo",
+        "when": {
+          "op": "eq",
+          "left": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "1"
+            }
+          }
+        },
+        "title": "Placer ses marqueurs — attrait de départ en solo",
+        "body": "Les débutants commencent à 20 d'attrait. Selon votre expérience, vous pouvez commencer à 10, ou même à 0 : la petite tuile Solo côté 35 s'utilise à partir de 10 d'attrait, et pas du tout à 0.",
+        "quantities": [
+          {
+            "label": "Attrait de départ conseillé",
+            "value": 20
+          }
+        ]
+      },
+      {
+        "id": "cubes",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Placer 7 cubes sur le côté gauche de son plateau Zoo",
+        "body": "Gardez les autres cubes à portée de main.",
+        "quantities": [
+          {
+            "label": "Cubes placés",
+            "value": 7,
+            "unit": "cubes"
+          }
+        ]
+      },
+      {
+        "id": "volunteers",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Placer ses bénévoles",
+        "body": "Un bénévole sur le bloc-notes du plateau Zoo — celui-ci est actif. Les 3 autres sont en réserve, couchés sur les emplacements correspondants.",
+        "quantities": [
+          {
+            "label": "Bénévoles",
+            "value": 4
+          },
+          {
+            "label": "Dont actif",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "money",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Prendre ses crédits de départ",
+        "quantities": [
+          {
+            "label": "Crédits",
+            "value": 25
+          }
+        ]
+      },
+      {
+        "id": "finalScoring",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Piocher 2 cartes Décompte final",
+        "body": "Vous pouvez les regarder à tout moment, mais les autres joueurs ne doivent pas les voir.",
+        "quantities": [
+          {
+            "label": "Cartes Décompte final",
+            "value": 2,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "hand",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Composer sa main de départ",
+        "body": "Piochez 8 cartes Zoo, gardez-en 4 et défaussez les 4 autres face visible. Il est conseillé de garder 1 à 2 cartes Mécène et 2 à 3 cartes Animal, en évitant les cartes trop difficiles à poser.",
+        "quantities": [
+          {
+            "label": "Cartes piochées",
+            "value": 8,
+            "unit": "cartes"
+          },
+          {
+            "label": "Cartes gardées",
+            "value": 4,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "reveal",
+        "scope": "TABLE",
+        "source": "livret officiel FR, impression 05/2023 v2.0, p. 4-5",
+        "title": "Révéler les 6 cartes de la rivière",
+        "body": "Une fois que tous les joueurs ont composé leur main."
+      }
+    ]
+  },
+  "ui": {
+    "layout": "playerGrid",
+    "fieldsPerPlayer": 2
+  },
   "scoringEngine": {
     "modes": [
       {
@@ -72,12 +368,18 @@
       {
         "code": "final.appeal",
         "label": "i18n:an.line.appeal",
-        "value": { "op": "ref", "id": "appeal" }
+        "value": {
+          "op": "ref",
+          "id": "appeal"
+        }
       },
       {
         "code": "final.conservation",
         "label": "i18n:an.line.conservation",
-        "value": { "op": "ref", "id": "conservationValue" }
+        "value": {
+          "op": "ref",
+          "id": "conservationValue"
+        }
       }
     ],
     "notices": [
@@ -88,8 +390,34 @@
         "when": {
           "op": "and",
           "args": [
-            { "op": "eq", "left": { "op": "ref", "id": "playerCount" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "1" } } },
-            { "op": "gte", "left": { "op": "ref", "id": "cumulative" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "100" } } }
+            {
+              "op": "eq",
+              "left": {
+                "op": "ref",
+                "id": "playerCount"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "1"
+                }
+              }
+            },
+            {
+              "op": "gte",
+              "left": {
+                "op": "ref",
+                "id": "cumulative"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "100"
+                }
+              }
+            }
           ]
         },
         "source": "livret p.19, mode solo : « Si vous avez au moins 100 points de victoire après le décompte final […] alors vous gagnez la partie »"
@@ -101,8 +429,34 @@
         "when": {
           "op": "and",
           "args": [
-            { "op": "eq", "left": { "op": "ref", "id": "playerCount" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "1" } } },
-            { "op": "lt", "left": { "op": "ref", "id": "cumulative" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "100" } } }
+            {
+              "op": "eq",
+              "left": {
+                "op": "ref",
+                "id": "playerCount"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "1"
+                }
+              }
+            },
+            {
+              "op": "lt",
+              "left": {
+                "op": "ref",
+                "id": "cumulative"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "100"
+                }
+              }
+            }
           ]
         },
         "source": "livret p.19, mode solo"
@@ -110,7 +464,12 @@
     ],
     "ranking": {
       "scope": "PARTICIPANT",
-      "criteria": [{ "metric": "cumulative", "direction": "DESC" }],
+      "criteria": [
+        {
+          "metric": "cumulative",
+          "direction": "DESC"
+        }
+      ],
       "missingPolicy": "BLOCK",
       "rankMode": "COMPETITION",
       "remainingTie": "SHARED_WIN"
@@ -124,5 +483,9 @@
       }
     ]
   },
-  "fixtures": ["arknova-livret-2p", "arknova-tiebreak-3p", "arknova-solo"]
+  "fixtures": [
+    "arknova-livret-2p",
+    "arknova-tiebreak-3p",
+    "arknova-solo"
+  ]
 }

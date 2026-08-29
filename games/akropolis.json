@@ -56,7 +56,179 @@
     }
   ],
   "setupAssistant": {
-    "enabled": true
+    "enabled": true,
+    "steps": [
+      {
+        "id": "tiles",
+        "scope": "TABLE",
+        "source": "livret officiel Gigamic 2022, p. 2-3",
+        "title": "Choisir les tuiles Cité",
+        "body": "Les tuiles portent une marque au dos. À 2 joueurs, ne prenez que les 2+ ; à 3 joueurs, les 2+ et les 3+ ; à 4 joueurs, toutes.",
+        "quantities": [
+          {
+            "label": "Tuiles en jeu",
+            "valueExpr": {
+              "op": "bracket",
+              "input": {
+                "op": "ref",
+                "id": "playerCount"
+              },
+              "table": [
+                {
+                  "upTo": 2,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "37"
+                  }
+                },
+                {
+                  "upTo": 3,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "49"
+                  }
+                },
+                {
+                  "upTo": 4,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "61"
+                  }
+                }
+              ]
+            },
+            "unit": "tuiles"
+          }
+        ]
+      },
+      {
+        "id": "piles",
+        "scope": "TABLE",
+        "source": "livret officiel Gigamic 2022, p. 2-3",
+        "title": "Former 11 piles égales, face cachée",
+        "body": "Pour une partie plus longue à 2 ou 3 joueurs, jouez avec toutes les tuiles : formez alors 19 piles (à 2 joueurs) ou 15 piles (à 3 joueurs).",
+        "quantities": [
+          {
+            "label": "Piles",
+            "value": 11
+          },
+          {
+            "label": "Tuiles par pile",
+            "valueExpr": {
+              "op": "bracket",
+              "input": {
+                "op": "ref",
+                "id": "playerCount"
+              },
+              "table": [
+                {
+                  "upTo": 2,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "3"
+                  }
+                },
+                {
+                  "upTo": 3,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "4"
+                  }
+                },
+                {
+                  "upTo": 4,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "5"
+                  }
+                }
+              ]
+            },
+            "unit": "tuiles"
+          }
+        ]
+      },
+      {
+        "id": "chantier",
+        "scope": "TABLE",
+        "source": "livret officiel Gigamic 2022, p. 2-3",
+        "title": "Aligner les tuiles restantes au centre : le Chantier",
+        "body": "En début de manche, le Chantier doit toujours contenir 2 tuiles de plus que le nombre d'Architectes.",
+        "quantities": [
+          {
+            "label": "Tuiles au Chantier",
+            "valueExpr": {
+              "op": "add",
+              "args": [
+                {
+                  "op": "ref",
+                  "id": "playerCount"
+                },
+                {
+                  "op": "lit",
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "2"
+                  }
+                }
+              ]
+            },
+            "unit": "tuiles"
+          }
+        ]
+      },
+      {
+        "id": "startTile",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel Gigamic 2022, p. 2-3",
+        "title": "Prendre une tuile de départ et la poser devant soi",
+        "body": "Elle vous donne une Place Habitations d'emblée.",
+        "quantities": [
+          {
+            "label": "Tuile de départ",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "firstPlayer",
+        "scope": "TABLE",
+        "source": "livret officiel Gigamic 2022, p. 2-3",
+        "title": "Désigner l'Architecte en Chef",
+        "body": "Le dernier architecte à avoir gravi une colline prend le pion."
+      },
+      {
+        "id": "stones",
+        "scope": "PER_PLAYER",
+        "source": "livret officiel Gigamic 2022, p. 2-3",
+        "title": "Prendre ses Pierres, dans le sens des aiguilles d'une montre",
+        "quantities": [
+          {
+            "label": "Pierres",
+            "bySeat": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "unit": "cubes"
+          }
+        ]
+      },
+      {
+        "id": "reserve",
+        "scope": "TABLE",
+        "source": "livret officiel Gigamic 2022, p. 2-3",
+        "title": "Placer les Pierres restantes à proximité",
+        "quantities": [
+          {
+            "label": "Réserve totale",
+            "value": 40,
+            "unit": "cubes"
+          }
+        ]
+      }
+    ]
   },
   "ui": {
     "layout": "categoryPager",

@@ -137,6 +137,47 @@ export type Notice = {
   source?: string | null
 }
 
+/** Une quantité de matériel. Elle dépend souvent de la configuration :
+ *  c'est tout l'intérêt d'un assistant de mise en place. */
+export type SetupQuantity = {
+  label: string
+  /** un nombre fixe */
+  value?: number
+  /** un nombre calculé — expression du même langage, sur les métriques de cœur */
+  valueExpr?: Node
+  /** un nombre par siège : [1er joueur, 2e, 3e, …] */
+  bySeat?: number[]
+  unit?: string
+}
+
+export type SetupStep = {
+  id: string
+  title: string
+  body?: string
+  /** TABLE : une fois pour tout le monde. PER_PLAYER : chacun le fait chez lui. */
+  scope: 'TABLE' | 'PER_PLAYER'
+  quantities?: SetupQuantity[]
+  /** L'étape ne s'affiche que si la condition tient — un mode solo ne se
+   *  prépare pas comme une table de quatre. */
+  when?: Node
+  /** D'où vient l'instruction. Une mise en place sans source est une invention. */
+  source?: string | null
+}
+
+export type SetupAssistant = {
+  /** false = aucune fiche n'est rédigée, et l'écran le dit au lieu de faire semblant */
+  enabled: boolean
+  /** L'assistant peut couvrir MOINS de configurations que le moteur de score :
+   *  un groupe peut vouloir compter une partie que l'app ne sait pas préparer.
+   *  Omis = couvre toutes les configurations du jeu. */
+  playerCountRules?: { min: number; max: number | null }
+  /** Motif affiché hors couverture — obligatoire si playerCountRules est restreint. */
+  outOfScopeNotice?: string
+  /** Motif affiché quand aucune fiche n'existe. */
+  missingNotice?: string
+  steps?: SetupStep[]
+}
+
 export type Bundle = {
   gameId: string
   version: string
@@ -146,17 +187,7 @@ export type Bundle = {
   playerCountRules: { min: number; max: number | null; softMax?: number }
   locales: string[]
   policies?: Policy[]
-  setupAssistant?: {
-    enabled: boolean
-    /** L'assistant peut couvrir MOINS de configurations que le moteur de score :
-     *  un groupe peut vouloir compter une partie que l'app ne sait pas préparer.
-     *  Omis = couvre toutes les configurations du jeu. */
-    playerCountRules?: { min: number; max: number | null }
-    /** Motif affiché hors couverture — obligatoire si playerCountRules est restreint. */
-    outOfScopeNotice?: string
-    steps?: unknown[]
-    materials?: unknown[]
-  }
+  setupAssistant?: SetupAssistant
   scoringEngine: {
     modes: ScoringMode[]
     contributions: Contribution[]

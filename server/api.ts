@@ -10,6 +10,7 @@ import { Catalogue } from './catalogue.ts'
 import { compute, modeOf } from './engine.ts'
 import { checkEntry, checkRound, type Entry as CEntry } from '../packages/rules-core/src/constraints.ts'
 import { relevance } from '../packages/rules-core/src/relevance.ts'
+import { resolveSetup } from '../packages/rules-core/src/setup.ts'
 import { canonical, parse, type Maybe, type NumericValue } from '../packages/rules-core/src/numeric.ts'
 import type { Bundle, Field, CollectionSpec } from '../packages/rules-core/src/bundle.ts'
 
@@ -142,6 +143,25 @@ export function mount(app: Router, store: Store, cat: Catalogue, clientDir: stri
   }))
 
   app.get('/api/matches/:id', (c: Ctx) => state(c.params.id))
+
+  /** La fiche de mise en place, résolue pour cette table : les quantités qui
+   *  dépendent du nombre de joueurs sont déjà calculées. */
+  app.get('/api/matches/:id/setup', (c: Ctx) => {
+    const m = need(c.params.id)
+    const b = cat.localized(m.game_id, m.locale)
+    if (!b) throw new HttpError(410, `le jeu « ${m.game_id} » n'est plus au catalogue`)
+    const ps = store.participants(m.id)
+    return { ...resolveSetup(b, ps.length), participants: ps.map(p => ({ id: p.id, name: p.name, seat: p.seat })) }
+  })
+
+  /** La même fiche avant même de créer la partie, pour un nombre de joueurs donné. */
+  app.get('/api/games/:gameId/setup', (c: Ctx) => {
+    const b = cat.localized(c.params.gameId, c.query.get('locale') ?? 'fr')
+    if (!b) throw new HttpError(404, 'jeu inconnu')
+    const n = Number(c.query.get('players') ?? b.playerCountRules.min)
+    if (!Number.isInteger(n) || n < 1) throw new HttpError(400, 'nombre de joueurs invalide')
+    return resolveSetup(b, n)
+  })
   app.get('/api/matches/:id/journal', (c: Ctx) => store.journal(c.params.id)
     .map(e => ({ ...e, payload: JSON.parse(e.payload) })))
 

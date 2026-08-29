@@ -22,6 +22,8 @@ export const api = {
   game:       id               => call('GET', `/api/games/${id}`),
   matches:    ()               => call('GET', '/api/matches'),
   match:      id               => call('GET', `/api/matches/${id}`),
+  setup:      id               => call('GET', `/api/matches/${id}/setup`),
+  gameSetup:  (id, players)    => call('GET', `/api/games/${id}/setup?players=${players}`),
   create:     body             => call('POST', '/api/matches', body),
   round:      (id, n, body)    => call('PUT', `/api/matches/${id}/rounds/${n}`, body),
   dropRound:  (id, n, body)    => call('DELETE', `/api/matches/${id}/rounds/${n}`, body),

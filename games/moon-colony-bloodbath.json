@@ -38,7 +38,8 @@
     }
   ],
   "setupAssistant": {
-    "enabled": true
+    "enabled": false,
+    "missingNotice": "Le livret de Moon Colony Bloodbath n'est pas à disposition : aucune fiche de mise en place n'a été rédigée plutôt que d'en inventer une. Le décompte, lui, est complet."
   },
   "ui": {
     "layout": "playerGrid",

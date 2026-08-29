@@ -54,6 +54,50 @@ export function validate(b: Bundle): Issue[] {
     }
   }
 
+  // ── l'assistant de mise en place ──────────────────────────────────────────
+  if (sa) {
+    const steps = sa.steps ?? []
+    if (sa.enabled && !steps.length)
+      err('EF-030', 'assistant déclaré actif sans aucune étape : l\'écran promettrait une aide qui n\'existe pas')
+    if (!sa.enabled && steps.length)
+      err('EF-030', 'assistant déclaré inactif alors que des étapes sont écrites')
+    if (!sa.enabled && !sa.missingNotice)
+      err('EF-030', 'assistant inactif sans motif affiché : l\'utilisateur doit savoir pourquoi')
+
+    const seen = new Set<string>()
+    const tableFields = new Set(b.scoringEngine?.modes.flatMap(m =>
+      m.inputs.filter(f => f.scope === 'GAME' || f.scope === 'ROUND').map(f => f.id)) ?? [])
+    const allowed = new Set<string>([...CORE_METRICS, ...tableFields])
+
+    for (const st of steps) {
+      if (!st.id) { err('EF-030', 'étape de mise en place sans identifiant'); continue }
+      if (seen.has(st.id)) err('EF-030', `étape « ${st.id} » déclarée deux fois`)
+      seen.add(st.id)
+      if (!st.title) err('EF-030', `étape « ${st.id} » sans intitulé`)
+      if (st.scope !== 'TABLE' && st.scope !== 'PER_PLAYER')
+        err('EF-030', `étape « ${st.id} » : portée « ${st.scope} » inconnue`)
+      if (st.source === undefined || st.source === null)
+        warn('EC-05', `étape « ${st.id} » sans source citée : une mise en place affirmée sans livret est une invention`)
+
+      const check = (n: Node, where: string) => walk(n, x => {
+        if ((x as any).op === 'ref' && !allowed.has((x as any).id))
+          err('EF-030', `${where} de « ${st.id} » : « ${(x as any).id} » n'est ni une métrique de cœur ni un champ de portée table`)
+      })
+      if (st.when) check(st.when, 'condition')
+
+      for (const q of st.quantities ?? []) {
+        if (!q.label) err('EF-030', `quantité sans intitulé dans l'étape « ${st.id} »`)
+        const forms = [q.value !== undefined, q.valueExpr !== undefined, q.bySeat !== undefined].filter(Boolean).length
+        if (forms !== 1)
+          err('EF-030', `quantité « ${q.label} » de l'étape « ${st.id} » : une seule forme parmi value, valueExpr et bySeat`)
+        if (q.valueExpr) check(q.valueExpr, `quantité « ${q.label} »`)
+        const max = sa.playerCountRules?.max ?? b.playerCountRules?.max
+        if (q.bySeat && max !== null && max !== undefined && q.bySeat.length < max)
+          err('EF-030', `quantité « ${q.label} » de l'étape « ${st.id} » : ${q.bySeat.length} valeurs par siège pour ${max} joueurs possibles`)
+      }
+    }
+  }
+
   // ── EC-01 · un bundle est une donnée ──────────────────────────────────────
   const scan = (v: unknown, path = ''): void => {
     if (typeof v === 'function') err('EC-01', `valeur exécutable en ${path}`)
