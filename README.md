@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 351 contrôles, aucune dépendance :
+Cinq portes, 354 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
@@ -169,12 +169,17 @@ piste de conservation n'est pas dans le livret, qui n'en montre que deux
 points. L'application demande donc la valeur lue sur le plateau au lieu de la
 position du marqueur, et la question reste affichée dans la partie.
 
-L'**alignement des zones**, lui, est relevé sur le plateau : 33 zones couvrant
-l'attrait 0 à 113, par groupes de 1, 2, 3, 4, 5 puis 6 cases. Un champ
-facultatif — le numéro de la case de conservation — permet à l'application de
-vérifier après coup que la fin de partie était bien déclenchée, c'est-à-dire
-que les deux marqueurs se sont rejoints ou croisés. Les trois exemples du
-livret passent ce contrôle ; une combinaison impossible est signalée.
+L'**alignement des deux pistes**, lui, est relevé sur le plateau. Les marqueurs
+avancent l'un vers l'autre sur la même bande : l'attrait monte de 0 à 113, la
+conservation descend de 113 vers 1 — 10 paires jusqu'à l'attrait 94, puis
+31 triplets jusqu'à 1, soit 42 cases de conservation. Un champ facultatif, le
+nombre de points de conservation, permet à l'application de dire si les
+marqueurs sont dans la **même zone**, s'ils se sont **croisés**, ou s'ils ne se
+sont pas rejoints — auquel cas la partie n'aurait pas dû s'arrêter.
+
+Le livret sert de preuve : il écrit que 64 d'attrait et 20 de conservation sont
+dans la même zone. La reconstruction place la conservation 20 sur l'attrait
+66-64, et 64 y tombe exactement. Les bornes sont testées à l'unité près.
 
 ## Ce qu'il y a dans le dépôt
 

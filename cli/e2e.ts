@@ -408,12 +408,23 @@ section('Ark Nova : la conservation devant l\'attrait')
     })
     return z.gameNotices.map((n: any) => n.code)
   }
-  ok('les trois exemples du livret : la fin était bien déclenchée',
-     (await zone(80, 24, 16)).includes('endReached') &&
-     (await zone(78, 30, 18)).includes('endReached') &&
-     (await zone(64, 28, 20)).includes('endReached'))
+  ok('Bleu et Rouge ont croisé leurs marqueurs',
+     (await zone(80, 24, 16)).includes('endCrossed') &&
+     (await zone(78, 30, 18)).includes('endCrossed'))
+  // le livret dit « les deux marqueurs sont dans la MÊME zone de décompte » :
+  // la conservation 20 occupe l'attrait 66-64, et 64 y tombe exactement
+  ok('l\'exemple de fin de partie du livret tombe pile sur la même zone',
+     (await zone(64, 28, 20)).includes('endSameZone'))
+  ok('les bornes de la zone sont exactes : 65 dedans, 67 croisé, 63 pas rejoint',
+     (await zone(65, 28, 20)).includes('endSameZone') &&
+     (await zone(67, 28, 20)).includes('endCrossed') &&
+     (await zone(63, 28, 20)).includes('endNotReached'))
   ok('une combinaison impossible est signalée',
      (await zone(20, 40, 30)).includes('endNotReached'))
+  ok('la dernière case de la piste occupe l\'attrait 3 à 1',
+     (await zone(1, 50, 41)).includes('endSameZone') &&
+     (await zone(3, 50, 41)).includes('endSameZone') &&
+     (await zone(4, 50, 41)).includes('endCrossed'))
   const sansCase = await play([{ id: 'solo', appeal: 80, conservation: 24 }])
   ok('le champ reste facultatif : rien n\'est dit sans lui',
      !sansCase.gameNotices.some((n: any) => n.code.startsWith('end')))
