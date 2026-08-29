@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 269 contrôles, aucune dépendance :
+Cinq portes, 272 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
@@ -90,6 +90,15 @@ Colony Bloodbath bascule entre saisie solo et multijoueur sans une ligne
 écrite pour lui. Deux garde-fous : un champ qui figure dans sa propre
 condition ne se désactive jamais lui-même — sinon on ne pourrait plus revenir
 en arrière — et une contribution exclusive écarte tout le reste.
+
+Ce que chaque jeu y gagne :
+
+| Jeu | Pertinence déduite | Matériel déclaré |
+|---|---|---|
+| Flip 7 | éliminé → plus rien d'autre à saisir | carte N en N exemplaires, une carte 0, un ×2, un de chaque bonus, 30 points de bonus en tout, pas de doublon chez un joueur |
+| Moon Colony Bloodbath | solo ↔ multijoueur, variante longue, objectif atteint | rien de confirmé |
+| Akropolis | rien à masquer : les cinq catégories comptent toujours | 40 cubes Pierre |
+| Dune: Imperium | rien à masquer : un seul champ | rien de confirmé |
 
 **Le matériel est fini, et cela se déclare.** `scoringEngine.scarcity` porte
 trois formes : `holders` (au plus N joueurs tiennent ce champ), `supply` (la

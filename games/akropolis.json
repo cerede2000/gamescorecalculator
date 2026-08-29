@@ -94,9 +94,10 @@
             "id": "varHousing",
             "label": "i18n:ak.varHousing",
             "type": "BOOLEAN",
-            "scope": "PARTICIPANT",
+            "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:cat.housing"
+            "usedBy": "formula:cat.housing",
+            "help": "i18n:ak.varHousing.help"
           },
           {
             "id": "marketStd",
@@ -258,9 +259,10 @@
             "id": "varHousing",
             "label": "i18n:ak.varHousing",
             "type": "BOOLEAN",
-            "scope": "PARTICIPANT",
+            "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:cat.housing"
+            "usedBy": "formula:cat.housing",
+            "help": "i18n:ak.varHousing.help"
           },
           {
             "id": "marketStars",

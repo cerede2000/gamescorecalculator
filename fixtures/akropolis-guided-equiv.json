@@ -2,42 +2,137 @@
   "game": "akropolis",
   "mode": "guided",
   "label": "Guidée — mêmes 32 et 61 points que l'express, comptés tuile par tuile",
-  "participants": [{ "id": "ada", "name": "Ada" }, { "id": "bruno", "name": "Bruno" }],
-  "rounds": [{
-    "ada": {
-      "values": {
-        "housingStars":  { "type": "INTEGER", "value": "3" },
-        "varHousing":    { "type": "BOOLEAN", "value": "false" },
-        "marketStars":   { "type": "INTEGER", "value": "0" },
-        "barracksStars": { "type": "INTEGER", "value": "0" },
-        "templeStars":   { "type": "INTEGER", "value": "0" },
-        "gardenStars":   { "type": "INTEGER", "value": "0" },
-        "stones":        { "type": "INTEGER", "value": "5" }
-      },
-      "collections": { "housingLevels": [[1, 5], [2, 2]] }
+  "participants": [
+    {
+      "id": "ada",
+      "name": "Ada"
     },
-    "bruno": {
-      "values": {
-        "housingStars":  { "type": "INTEGER", "value": "2" },
-        "varHousing":    { "type": "BOOLEAN", "value": "true" },
-        "marketStars":   { "type": "INTEGER", "value": "2" },
-        "barracksStars": { "type": "INTEGER", "value": "1" },
-        "templeStars":   { "type": "INTEGER", "value": "0" },
-        "gardenStars":   { "type": "INTEGER", "value": "0" },
-        "stones":        { "type": "INTEGER", "value": "1" }
+    {
+      "id": "bruno",
+      "name": "Bruno"
+    }
+  ],
+  "rounds": [
+    {
+      "ada": {
+        "values": {
+          "housingStars": {
+            "type": "INTEGER",
+            "value": "3"
+          },
+          "varHousing": {
+            "type": "BOOLEAN",
+            "value": "true"
+          },
+          "marketStars": {
+            "type": "INTEGER",
+            "value": "0"
+          },
+          "barracksStars": {
+            "type": "INTEGER",
+            "value": "0"
+          },
+          "templeStars": {
+            "type": "INTEGER",
+            "value": "0"
+          },
+          "gardenStars": {
+            "type": "INTEGER",
+            "value": "0"
+          },
+          "stones": {
+            "type": "INTEGER",
+            "value": "5"
+          }
+        },
+        "collections": {
+          "housingLevels": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ]
+        }
       },
-      "collections": {
-        "housingLevels":     [[2, 6]],
-        "marketStdLevels":   [[1, 3]],
-        "marketDblLevels":   [[1, 1]],
-        "barracksStdLevels": [[1, 2]],
-        "gardenStdLevels":   [[1, 4]]
+      "bruno": {
+        "values": {
+          "housingStars": {
+            "type": "INTEGER",
+            "value": "2"
+          },
+          "varHousing": {
+            "type": "BOOLEAN",
+            "value": "true"
+          },
+          "marketStars": {
+            "type": "INTEGER",
+            "value": "2"
+          },
+          "barracksStars": {
+            "type": "INTEGER",
+            "value": "1"
+          },
+          "templeStars": {
+            "type": "INTEGER",
+            "value": "0"
+          },
+          "gardenStars": {
+            "type": "INTEGER",
+            "value": "0"
+          },
+          "stones": {
+            "type": "INTEGER",
+            "value": "1"
+          }
+        },
+        "collections": {
+          "housingLevels": [
+            [
+              2,
+              6
+            ]
+          ],
+          "marketStdLevels": [
+            [
+              1,
+              3
+            ]
+          ],
+          "marketDblLevels": [
+            [
+              1,
+              1
+            ]
+          ],
+          "barracksStdLevels": [
+            [
+              1,
+              2
+            ]
+          ],
+          "gardenStdLevels": [
+            [
+              1,
+              4
+            ]
+          ]
+        }
       }
     }
-  }],
+  ],
   "expect": {
-    "totals": { "ada": 32, "bruno": 61 },
-    "ranks":  { "bruno": 1, "ada": 2 }
+    "totals": {
+      "ada": 32,
+      "bruno": 61
+    },
+    "ranks": {
+      "bruno": 1,
+      "ada": 2
+    }
   },
   "note": "Les mêmes cités que akropolis-livret-2p, saisies en comptant les tuiles par niveau au lieu d'annoncer les valeurs. Ada : 1×5 + 2×2 = 9. Bruno : 2×6 = 12, donc la variante double."
 }

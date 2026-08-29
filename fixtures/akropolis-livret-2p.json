@@ -2,48 +2,161 @@
   "game": "akropolis",
   "mode": "express",
   "label": "Exemple du livret — Habitations 5×1 + 2×2 = 9, trois étoiles, 27 points",
-  "participants": [{ "id": "ada", "name": "Ada" }, { "id": "bruno", "name": "Bruno" }],
-  "rounds": [{
-    "ada": {
-      "housingValue": { "type": "INTEGER", "value": "9" },
-      "housingStars": { "type": "INTEGER", "value": "3" },
-      "varHousing":   { "type": "BOOLEAN", "value": "false" },
-      "marketStd":    { "type": "INTEGER", "value": "0" },
-      "marketDbl":    { "type": "INTEGER", "value": "0" },
-      "marketStars":  { "type": "INTEGER", "value": "0" },
-      "barracksStd":  { "type": "INTEGER", "value": "0" },
-      "barracksDbl":  { "type": "INTEGER", "value": "0" },
-      "barracksStars":{ "type": "INTEGER", "value": "0" },
-      "templeStd":    { "type": "INTEGER", "value": "0" },
-      "templeDbl":    { "type": "INTEGER", "value": "0" },
-      "templeStars":  { "type": "INTEGER", "value": "0" },
-      "gardenStd":    { "type": "INTEGER", "value": "0" },
-      "gardenDbl":    { "type": "INTEGER", "value": "0" },
-      "gardenStars":  { "type": "INTEGER", "value": "0" },
-      "stones":       { "type": "INTEGER", "value": "5" }
+  "participants": [
+    {
+      "id": "ada",
+      "name": "Ada"
     },
-    "bruno": {
-      "housingValue": { "type": "INTEGER", "value": "12" },
-      "housingStars": { "type": "INTEGER", "value": "2" },
-      "varHousing":   { "type": "BOOLEAN", "value": "true" },
-      "marketStd":    { "type": "INTEGER", "value": "3" },
-      "marketDbl":    { "type": "INTEGER", "value": "1" },
-      "marketStars":  { "type": "INTEGER", "value": "2" },
-      "barracksStd":  { "type": "INTEGER", "value": "2" },
-      "barracksDbl":  { "type": "INTEGER", "value": "0" },
-      "barracksStars":{ "type": "INTEGER", "value": "1" },
-      "templeStd":    { "type": "INTEGER", "value": "0" },
-      "templeDbl":    { "type": "INTEGER", "value": "0" },
-      "templeStars":  { "type": "INTEGER", "value": "0" },
-      "gardenStd":    { "type": "INTEGER", "value": "4" },
-      "gardenDbl":    { "type": "INTEGER", "value": "0" },
-      "gardenStars":  { "type": "INTEGER", "value": "0" },
-      "stones":       { "type": "INTEGER", "value": "1" }
+    {
+      "id": "bruno",
+      "name": "Bruno"
     }
-  }],
+  ],
+  "rounds": [
+    {
+      "ada": {
+        "housingValue": {
+          "type": "INTEGER",
+          "value": "9"
+        },
+        "housingStars": {
+          "type": "INTEGER",
+          "value": "3"
+        },
+        "varHousing": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "marketStd": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "marketDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "marketStars": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "barracksStd": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "barracksDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "barracksStars": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeStd": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeStars": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "gardenStd": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "gardenDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "gardenStars": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "stones": {
+          "type": "INTEGER",
+          "value": "5"
+        }
+      },
+      "bruno": {
+        "housingValue": {
+          "type": "INTEGER",
+          "value": "12"
+        },
+        "housingStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "varHousing": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "marketStd": {
+          "type": "INTEGER",
+          "value": "3"
+        },
+        "marketDbl": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "marketStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "barracksStd": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "barracksDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "barracksStars": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "templeStd": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeStars": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "gardenStd": {
+          "type": "INTEGER",
+          "value": "4"
+        },
+        "gardenDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "gardenStars": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "stones": {
+          "type": "INTEGER",
+          "value": "1"
+        }
+      }
+    }
+  ],
   "expect": {
-    "totals": { "ada": 32, "bruno": 61 },
-    "ranks":  { "bruno": 1, "ada": 2 }
+    "totals": {
+      "ada": 32,
+      "bruno": 61
+    },
+    "ranks": {
+      "bruno": 1,
+      "ada": 2
+    }
   },
   "note": "Ada : 9×3×1 = 27, plus 5 Pierres = 32. Bruno : la variante double un groupe de valeur ≥ 10, donc 12×2×2 = 48 ; Marchés (3 + 2×1) × 2 = 10 ; Casernes 2×1 = 2 ; Jardins sans étoile = 0 ; plus 1 Pierre = 61."
 }

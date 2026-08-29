@@ -147,8 +147,10 @@ let inc = await call('POST', '/api/matches', {
 inc = await call('PUT', `/api/matches/${inc.match.id}/rounds/1`, {
   expectedVersion: inc.match.version,
   inputs: {
-    x: { values: { housingValue: 9, housingStars: 3, varHousing: false } },   // le reste non saisi
-    y: { values: { housingValue: 4, housingStars: 1, varHousing: false, marketStd: 0, marketDbl: 0, marketStars: 0, barracksStd: 0, barracksDbl: 0, barracksStars: 0, templeStd: 0, templeDbl: 0, templeStars: 0, gardenStd: 0, gardenDbl: 0, gardenStars: 0, stones: 0 } }
+    // la variante se choisit pour la table, pas par joueur
+    '@table': { values: { varHousing: false } },
+    x: { values: { housingValue: 9, housingStars: 3 } },   // le reste non saisi
+    y: { values: { housingValue: 4, housingStars: 1, marketStd: 0, marketDbl: 0, marketStars: 0, barracksStd: 0, barracksDbl: 0, barracksStars: 0, templeStd: 0, templeDbl: 0, templeStars: 0, gardenStd: 0, gardenDbl: 0, gardenStars: 0, stones: 0 } }
   }
 })
 ok('un total incomplet vaut INCONNU, pas un nombre', inc.totals.x === null, `obtenu ${JSON.stringify(inc.totals.x)}`)
@@ -210,11 +212,35 @@ await okCase('un joueur éliminé ne retient plus la carte ×2 des autres', asyn
     b: { values: { busted: F, x2: T } }
   })
 })
-await okCase('la carte 0, dont le nombre n\'est pas confirmé, n\'est pas limitée', async () => {
+await refuse('deux cartes 0, alors que le paquet n\'en contient qu\'une', async () => {
   const st = await f7()
   await put(st, {
     a: { values: { busted: F, x2: F }, collections: { cards: [0, 3] } },
     b: { values: { busted: F, x2: F }, collections: { cards: [0, 4] } }
+  })
+})
+await refuse('deux joueurs qui prennent le même bonus +6', async () => {
+  const st = await f7()
+  await put(st, {
+    a: { values: { busted: F, x2: F }, collections: { bonuses: [6] } },
+    b: { values: { busted: F, x2: F }, collections: { bonuses: [6] } }
+  })
+})
+await refuse('plus de 30 points de bonus sur la table', async () => {
+  const st = await call('POST', '/api/matches', {
+    gameId: 'flip7', mode: 'express',
+    players: [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }]
+  })
+  await put(st, {
+    a: { values: { busted: F, numberSum: 10, x2: F, bonusSum: 20, flip7: F } },
+    b: { values: { busted: F, numberSum: 10, x2: F, bonusSum: 20, flip7: F } }
+  })
+})
+await okCase('le paquet entier de bonus réparti entre deux joueurs', async () => {
+  const st = await f7()
+  await put(st, {
+    a: { values: { busted: F, x2: F }, collections: { bonuses: [2, 8] } },
+    b: { values: { busted: F, x2: F }, collections: { bonuses: [4, 6, 10] } }
   })
 })
 

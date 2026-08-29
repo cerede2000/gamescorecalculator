@@ -47,29 +47,25 @@
     },
     {
       "id": "zeroCardCopies",
-      "status": "unconfirmed",
-      "question": "Combien d'exemplaires de la carte 0 le paquet contient-il ? La règle « la carte N existe en N exemplaires » ne dit rien de zéro.",
+      "status": "confirmed",
       "options": [
-        "1",
-        "unknown"
+        "1"
       ],
-      "provisional": "unlimited",
+      "provisional": "1",
       "affectsScore": false,
-      "source": null,
-      "rationale": "Faute de nombre confirmé, la carte 0 n'est pas limitée à la saisie."
+      "source": "détenteur des règles, 2026-08-29",
+      "rationale": "Le paquet contient une seule carte 0."
     },
     {
       "id": "bonusCardCopies",
-      "status": "unconfirmed",
-      "question": "Combien d'exemplaires de chaque carte bonus (+2, +4, +6, +8, +10) le paquet contient-il ?",
+      "status": "confirmed",
       "options": [
-        "oneEach",
-        "unknown"
+        "oneEach"
       ],
-      "provisional": "unlimited",
+      "provisional": "oneEach",
       "affectsScore": false,
-      "source": null,
-      "rationale": "Faute de nombres confirmés, les bonus ne sont pas limités à la saisie, contrairement au ×2."
+      "source": "détenteur des règles, 2026-08-29",
+      "rationale": "Chaque carte bonus n'existe qu'en un exemplaire."
     }
   ],
   "ui": {
@@ -121,7 +117,8 @@
             "control": "stepper",
             "usedBy": "formula:round.bonus",
             "step": 2,
-            "help": "i18n:f7.bonusSum.help"
+            "help": "i18n:f7.bonusSum.help",
+            "max": 30
           },
           {
             "id": "flip7",
@@ -434,6 +431,7 @@
         "kind": "copies",
         "target": "cards",
         "byValue": {
+          "0": 1,
           "1": 1,
           "2": 2,
           "3": 3,
@@ -449,7 +447,7 @@
         },
         "usedBy": "derive:numberSum",
         "message": "i18n:f7.scarcity.cards",
-        "source": "détenteur des règles, 2026-08-29 : la carte N existe en N exemplaires"
+        "source": "détenteur des règles, 2026-08-29 : la carte N existe en N exemplaires, et la carte 0 en un seul"
       },
       {
         "id": "x2Card",
@@ -460,6 +458,32 @@
         "usedBy": "formula:round.numbers",
         "message": "i18n:f7.scarcity.x2",
         "source": "détenteur des règles, 2026-08-29 : le paquet ne contient qu'une carte ×2"
+      },
+      {
+        "id": "bonusCardCopies",
+        "label": "i18n:f7.bonuses",
+        "kind": "copies",
+        "target": "bonuses",
+        "byValue": {
+          "2": 1,
+          "4": 1,
+          "6": 1,
+          "8": 1,
+          "10": 1
+        },
+        "usedBy": "derive:bonusSum",
+        "message": "i18n:f7.scarcity.bonuses",
+        "source": "détenteur des règles, 2026-08-29 : un exemplaire de chaque carte bonus"
+      },
+      {
+        "id": "bonusTotal",
+        "label": "i18n:f7.bonusSum",
+        "kind": "supply",
+        "target": "bonusSum",
+        "limit": 30,
+        "usedBy": "formula:round.bonus",
+        "message": "i18n:f7.scarcity.bonusTotal",
+        "source": "conséquence de « un exemplaire de chaque » : 2+4+6+8+10 = 30"
       }
     ]
   },
