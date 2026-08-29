@@ -1,12 +1,16 @@
 // Écrans et navigation. L'ordre est celui du parcours réel :
 // on prépare la table, la partie se joue, on saisit le résultat, on classe.
 
-import { api, ApiError, show, isUnknown, num, INT } from './api.js'
+import { api, ApiError, show, isUnknown, num, INT, uuid } from './api.js'
 import { el, clear, toast } from './dom.js'
 
 /** name est un dictionnaire de locales dans le bundle ; l'API le résout ailleurs. */
 const gname = g => (typeof g.name === 'string' ? g.name : (g.name?.fr ?? g.gameId))
-import { fieldControl, collectionControl } from './controls.js'
+import { fieldControl, collectionControl, setEnabled } from './controls.js'
+// Le noyau, servi par le serveur après retrait des types : une seule source
+// pour ce que l'écran désactive et pour ce que le serveur refuse.
+import { relevance } from '/core/relevance.ts'
+import { exhausted } from '/core/constraints.ts'
 
 const main = document.getElementById('main')
 /** Libellés d'interface, chargés une fois. Une clé absente se rend telle quelle. */
@@ -225,6 +229,53 @@ async function matchScreen(id) {
   }
 
   // ── saisie ───────────────────────────────────────────────────────────────
+  /** Les contrôles construits, pour les neutraliser sans les reconstruire. */
+  const wired = []
+
+  /** Les règles du jeu appliquées à la saisie : un champ que rien ne peut
+   *  plus faire compter est neutralisé, et on dit lequel l'a écarté. */
+  function applyRules() {
+    const table = tableState()
+    for (const w of wired) {
+      const values = { ...draft[TABLE].values, ...draft[w.pid].values }
+      const cols = Object.fromEntries(Object.entries(draft[w.pid].collections)
+        .map(([k, items]) => [k, items.map(([a, b]) => ({ k: a, v: b }))]))
+      const rel = relevance(game, mode, values, cols)
+      const gone = exhausted(game, mode, table, w.pid).fields
+
+      let on = rel.enabled[w.id] !== false
+      let why = on ? '' : `sans objet : ${rel.because[w.id] ?? ''}`
+      // un exemplaire unique déjà pris ailleurs : on ne peut pas le prendre
+      // aussi, mais celui qui l'a peut toujours le rendre
+      if (on && gone.has(w.id) && draft[w.pid].values[w.id]?.value !== 'true') {
+        on = false
+        why = 'déjà pris à cette table'
+      }
+      setEnabled(w.control, on)
+      w.row.classList.toggle('moot', !on)
+      w.why.textContent = why
+      w.control.refresh?.()
+    }
+    countFilled()
+  }
+
+  /** Ce que les autres joueurs ont déjà pris, du point de vue de celui-ci. */
+  function tableState() {
+    return Object.fromEntries(st.participants.map(p => {
+      const values = { ...draft[TABLE].values, ...draft[p.id].values }
+      const cols = Object.fromEntries(Object.entries(draft[p.id].collections)
+        .map(([k, items]) => [k, items.map(([a, b]) => ({ k: a, v: b }))]))
+      // un champ sans objet ne retient rien : un joueur éliminé ne garde pas
+      // la carte des autres
+      const rel = relevance(game, mode, values, cols)
+      const kept = { values: {}, collections: {} }
+      for (const [k, v] of Object.entries(values)) if (rel.enabled[k] !== false) kept.values[k] = v
+      for (const [k, v] of Object.entries(draft[p.id].collections)) if (rel.enabled[k] !== false) kept.collections[k] = v
+      return [p.id, kept]
+    }))
+  }
+  const takenFor = (pid, collectionId) => exhausted(game, mode, tableState(), pid).values[collectionId] ?? null
+
   /** Le compte des joueurs complets suit la frappe : un compteur figé à 0
    *  pendant qu'on remplit ment sur ce qu'il mesure. */
   const fill = el('span', { class: 'fill' })
@@ -235,6 +286,7 @@ async function matchScreen(id) {
   }
 
   function entry() {
+    wired.length = 0
     main.append(el('h2', {}, perRound ? `Saisie — manche ${round}` : 'Saisie'))
 
     const tableFields = mode.inputs.filter(isTable)
@@ -268,7 +320,7 @@ async function matchScreen(id) {
         ? el('button', { class: 'btn', onclick: () => save().then(() => { round++; seed(); render() }) }, 'Manche suivante')
         : null,
       el('button', { class: 'btn primary', onclick: () => save().then(finish) }, 'Terminer la partie'))
-    countFilled()
+    applyRules()
   }
 
   /** Les collections d'une page : celles qui alimentent une dérivation
@@ -293,18 +345,33 @@ async function matchScreen(id) {
     return el('div', { class: 'card' },
       el('div', { class: 'eyebrow' }, p.name),
       fields.map(f => fieldRow(f, p.id)),
-      cols.map(c => el('div', { class: 'field' },
-        el('span', { class: 'lab' }, c.label),
-        c.help ? el('span', { class: 'help' }, c.help) : null,
-        collectionControl(c, draft[p.id].collections[c.id] ?? [], items => { draft[p.id].collections[c.id] = items; countFilled() }))))
+      cols.map(c => {
+        const control = collectionControl(c, draft[p.id].collections[c.id] ?? [],
+          items => { draft[p.id].collections[c.id] = items; applyRules() },
+          () => takenFor(p.id, c.id))
+        const why = el('span', { class: 'moot-why' })
+        const row = el('div', { class: 'field' },
+          el('span', { class: 'lab' }, c.label),
+          c.help ? el('span', { class: 'help' }, c.help) : null,
+          control, why)
+        wired.push({ id: c.id, pid: p.id, control, row, why })
+        return row
+      }))
   }
 
   function fieldRow(f, owner) {
-    return el('div', { class: 'field' },
+    const control = fieldControl(f, draft[owner].values[f.id] ?? null,
+      v => { draft[owner].values[f.id] = v; applyRules() })
+    const why = el('span', { class: 'moot-why' })
+    const row = el('div', { class: 'field' },
       el('span', { class: 'lab' }, f.label,
         f.required ? el('span', { class: 'tiny', style: 'color:var(--wood);font-weight:400' }, ' — requis') : null),
       f.help ? el('span', { class: 'help' }, f.help) : null,
-      fieldControl(f, draft[owner].values[f.id] ?? null, v => { draft[owner].values[f.id] = v; countFilled() }))
+      control, why)
+    // les champs de portée table valent pour tout le monde : leur pertinence
+    // se juge sur le premier participant, faute d'appartenir à quiconque
+    wired.push({ id: f.id, pid: owner === TABLE ? st.participants[0].id : owner, control, row, why })
+    return row
   }
 
   async function save() {
@@ -318,7 +385,7 @@ async function matchScreen(id) {
       }
       inputs[owner] = { values, collections: slot.collections }
     }
-    st = await api.round(id, round, { expectedVersion: st.match.version, commandId: crypto.randomUUID(), inputs })
+    st = await api.round(id, round, { expectedVersion: st.match.version, commandId: uuid(), inputs })
       .catch(e => { toast(e.message, true); throw e })
     render()
   }
@@ -358,6 +425,9 @@ async function matchScreen(id) {
           el('tr', {}, el('td', {}, p.name),
             el('td', { class: 'v' + (isUnknown(st.totals[p.id]) ? ' unknown' : '') }, show(st.totals[p.id]))))))))
     }
+    for (const n of st.gameNotices ?? [])
+      main.append(el('div', { class: 'note calm', style: 'margin-top:12px' },
+        el('p', { style: 'margin:0' }, n.label, ' — ', n.by.map(nameOf).join(', '), '.')))
     for (const t of st.triggers)
       main.append(el('div', { class: 'note', style: 'margin-top:12px' },
         el('div', { class: 'eyebrow', style: 'color:var(--wood)' }, 'Fin de partie'),
@@ -427,7 +497,7 @@ async function matchScreen(id) {
         e.target.disabled = true
         try {
           st = await api.tiebreak(id, {
-            expectedVersion: st.match.version, commandId: crypto.randomUUID(),
+            expectedVersion: st.match.version, commandId: uuid(),
             metric: q.metric, values: Object.fromEntries(q.ids.map(p => [p, values[p] ?? null]))
           })
           render()

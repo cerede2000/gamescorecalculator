@@ -17,6 +17,9 @@
   "f7.line.numbers":           "Cartes numéro",
   "f7.line.bonus":             "Bonus",
   "f7.line.flip7":             "Flip 7",
+  "f7.notice.tieAtThreshold":  "Égalité à 200 points ou plus : on joue une manche supplémentaire pour départager.",
+  "f7.scarcity.cards":         "La carte N existe en N exemplaires : une seule carte 1, deux cartes 2, et ainsi de suite.",
+  "f7.scarcity.x2":            "Le paquet ne contient qu'une carte ×2 : un seul joueur peut l'avoir dans la manche.",
   "f7.end.threshold":          "Un joueur atteint 200 points",
   "f7.end.threshold.explain":  "La manche en cours se termine, puis la partie s'arrête.",
 
@@ -53,6 +56,7 @@
   "ak.line.garden":            "Jardins",
   "ak.line.stones":            "Pierres",
   "ak.tb.stones":              "Cubes Pierre",
+  "ak.scarcity.stones":        "La boîte contient 40 cubes Pierre : la table ne peut pas en déclarer davantage.",
 
   "mc.solo":                   "Partie solo",
   "mc.soloExt":                "Solo, variante longue",
@@ -82,6 +86,11 @@
   "policy.mostFlip7":          "le plus de Flip 7",
   "policy.fewestBusts":        "le moins de manches perdues",
   "policy.11x4+4x3":           "11 piles de 4 et 4 piles de 3",
+  "policy.extraRound":         "une manche supplémentaire",
+  "policy.unlimited":          "aucune limite à la saisie",
+  "policy.oneEach":            "un exemplaire de chaque",
+  "policy.unknown":            "inconnu",
+  "policy.1":                  "un exemplaire",
 
   "ui.app":                    "Tablée",
   "ui.tagline":                "Prépare la table, puis compte.",

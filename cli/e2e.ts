@@ -158,6 +158,93 @@ ok('classement refusé, pas une panne : le serveur répond et nomme qui manque',
    inc.ranking === null && inc.blocked?.ids.includes('x') && !inc.blocked.ids.includes('y'),
    JSON.stringify(inc.blocked))
 
+// ── ce que le matériel interdit ───────────────────────────────────────────
+console.log()
+console.log(b('Le matériel est fini'))
+const f7 = async () => call('POST', '/api/matches', {
+  gameId: 'flip7', mode: 'guided',
+  players: [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }]
+})
+const put = (st: any, inputs: any) =>
+  call('PUT', `/api/matches/${st.match.id}/rounds/1`, { expectedVersion: st.match.version, inputs })
+
+const T = { type: 'BOOLEAN', value: 'true' }, F = { type: 'BOOLEAN', value: 'false' }
+
+await refuse('deux joueurs qui tiennent la seule carte ×2', async () => {
+  const st = await f7()
+  await put(st, { a: { values: { busted: F, x2: T } }, b: { values: { busted: F, x2: T } } })
+})
+await refuse('deux exemplaires de la carte 1 sur la table', async () => {
+  const st = await f7()
+  await put(st, {
+    a: { values: { busted: F, x2: F }, collections: { cards: [1, 5] } },
+    b: { values: { busted: F, x2: F }, collections: { cards: [1, 7] } }
+  })
+})
+await refuse('deux fois la même carte chez un joueur', async () => {
+  const st = await f7()
+  await put(st, { a: { values: { busted: F, x2: F }, collections: { cards: [5, 5] } } })
+})
+await refuse('plus de 40 cubes Pierre sur la table', async () => {
+  const st = await call('POST', '/api/matches', {
+    gameId: 'akropolis', mode: 'express',
+    players: [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }]
+  })
+  await put(st, { a: { values: { stones: 25 } }, b: { values: { stones: 20 } } })
+})
+
+const okCase = async (label: string, fn: () => Promise<unknown>) => {
+  try { await fn(); ok(label, true) } catch (e: any) { ok(label, false, `— refusé : ${e.message}`) }
+}
+await okCase('deux cartes 2 sur la table : le paquet en contient deux', async () => {
+  const st = await f7()
+  await put(st, {
+    a: { values: { busted: F, x2: F }, collections: { cards: [2, 5] } },
+    b: { values: { busted: F, x2: F }, collections: { cards: [2, 7] } }
+  })
+})
+await okCase('un joueur éliminé ne retient plus la carte ×2 des autres', async () => {
+  const st = await f7()
+  await put(st, {
+    a: { values: { busted: T, x2: T } },
+    b: { values: { busted: F, x2: T } }
+  })
+})
+await okCase('la carte 0, dont le nombre n\'est pas confirmé, n\'est pas limitée', async () => {
+  const st = await f7()
+  await put(st, {
+    a: { values: { busted: F, x2: F }, collections: { cards: [0, 3] } },
+    b: { values: { busted: F, x2: F }, collections: { cards: [0, 4] } }
+  })
+})
+
+// ── les règles atteignent la saisie ───────────────────────────────────────
+console.log()
+console.log(b('Les règles atteignent la saisie'))
+{
+  const { relevance } = await import('../packages/rules-core/src/relevance.ts')
+  const bundle = JSON.parse(readFileSync('games/flip7.json', 'utf8'))
+  const mode = bundle.scoringEngine.modes[0]
+  const off = (r: any) => Object.entries(r.enabled).filter(([, v]) => !v).map(([k]) => k).sort().join(',')
+  ok('éliminé : plus rien d\'autre à saisir',
+     off(relevance(bundle, mode, { busted: T })) === 'bonusSum,flip7,numberSum,x2')
+  ok('non éliminé : tout reste saisissable',
+     off(relevance(bundle, mode, { busted: F })) === '')
+  ok('l\'élimination reste réversible', relevance(bundle, mode, { busted: T }).enabled.busted === true)
+
+  const mcb = JSON.parse(readFileSync('games/moon-colony-bloodbath.json', 'utf8'))
+  const me = mcb.scoringEngine.modes[0]
+  ok('solo : les habitants disparaissent, l\'Événement apparaît',
+     off(relevance(mcb, me, { soloVariant: T, extendedSolo: F, manualReached: F })) === 'moonBaseHabitants,printedHabitants,robotsAdded')
+  ok('les interrupteurs qui pilotent restent tous accessibles',
+     ['soloVariant', 'extendedSolo', 'manualReached'].every(k =>
+       relevance(mcb, me, { soloVariant: T, extendedSolo: T, manualReached: T }).enabled[k] === true))
+
+  const ak = JSON.parse(readFileSync('games/akropolis.json', 'utf8'))
+  ok('un jeu sans condition ne désactive rien',
+     off(relevance(ak, ak.scoringEngine.modes[0], {})) === '')
+}
+
 // ── idempotence ───────────────────────────────────────────────────────────
 console.log()
 console.log(b('Idempotence'))

@@ -867,6 +867,18 @@
         "direction": "DESC",
         "label": "i18n:ak.tb.stones"
       }
+    ],
+    "scarcity": [
+      {
+        "id": "stoneSupply",
+        "label": "i18n:ak.stones",
+        "kind": "supply",
+        "target": "stones",
+        "limit": 40,
+        "usedBy": "formula:stones",
+        "message": "i18n:ak.scarcity.stones",
+        "source": "livret, matériel : « 40 cubes Pierre »"
+      }
     ]
   },
   "fixtures": [

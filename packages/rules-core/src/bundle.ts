@@ -58,6 +58,30 @@ export type CollectionSpec = {
   max?: number
   control?: 'chips' | 'stepper' | 'keypad'
   help?: string
+  /** valueList : deux fois la même valeur est impossible pour un participant. */
+  distinct?: boolean
+  /** valueList : nombre maximal d'éléments pour un participant. */
+  maxItems?: number
+}
+
+/** Le MATÉRIEL est fini. Ce qu'une boîte contient limite ce qu'une table peut
+ *  déclarer, et cette limite porte sur tous les participants à la fois.
+ *  La vérification porte sur une manche : pour un jeu à manche unique,
+ *  la manche est la partie. */
+export type Scarcity = {
+  id: string
+  label: string
+  /** holders : au plus `limit` participants tiennent ce champ booléen.
+   *  supply  : la somme de ce champ entier sur la table ne dépasse pas `limit`.
+   *  copies  : chaque valeur de cette collection n'existe qu'en `byValue`
+   *            exemplaires — une valeur absente de la table n'est pas limitée. */
+  kind: 'holders' | 'supply' | 'copies'
+  target: string
+  limit?: number
+  byValue?: Record<string, number>
+  usedBy: string
+  message: string
+  source?: string | null
 }
 
 export type ScoringMode = {
@@ -79,6 +103,17 @@ export type EndCondition = {
   mode: 'auto' | 'confirm' | 'manual'
   reversible?: boolean
   explain?: string
+}
+
+/** Un fait de la partie qu'il faut DIRE, sans qu'il change l'état.
+ *  Une condition de fin arrête la partie ; un avis explique seulement
+ *  pourquoi elle ne s'arrête pas encore. */
+export type Notice = {
+  code: string
+  label: string
+  when: Node
+  level: 'info' | 'warn'
+  source?: string | null
 }
 
 export type Bundle = {
@@ -105,6 +140,8 @@ export type Bundle = {
     modes: ScoringMode[]
     contributions: Contribution[]
     endConditions?: EndCondition[]
+    notices?: Notice[]
+    scarcity?: Scarcity[]
     ranking: RankSpec
     tieBreakers?: RankSpec['criteria']
   }

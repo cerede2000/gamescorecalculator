@@ -4,6 +4,14 @@
 import { el } from './dom.js'
 import { INT, BOOL, isUnknown } from './api.js'
 
+/** Active ou neutralise un contrôle déjà construit, sans le reconstruire :
+ *  reconstruire ferait perdre le curseur à chaque frappe. */
+export function setEnabled(node, on) {
+  node.classList.toggle('off', !on)
+  for (const el of node.querySelectorAll('input, button')) el.disabled = !on
+  if (node.matches('input, button')) node.disabled = !on
+}
+
 /** Un interrupteur n'a pas d'état « inconnu » : éteint veut dire non.
  *  Un pas-à-pas, si : tant qu'on n'y a pas touché, la valeur n'existe pas. */
 export function fieldControl(field, value, onChange) {
@@ -75,20 +83,34 @@ function chips(field, value, onChange) {
 
 // ── collections ────────────────────────────────────────────────────────────
 // items : tableau de paires [k, v]. Le serveur les reçoit telles quelles.
-export function collectionControl(spec, items, onChange) {
-  return spec.kind === 'keyedCounts' ? keyed(spec, items, onChange) : list(spec, items, onChange)
+export function collectionControl(spec, items, onChange, taken = null) {
+  return spec.kind === 'keyedCounts' ? keyed(spec, items, onChange) : list(spec, items, onChange, taken)
 }
 
-function list(spec, items, onChange) {
+function list(spec, items, onChange, taken) {
   let cur = items.map(([, v]) => v)
   const repack = () => onChange(cur.map((v, i) => [i, v]))
   const wrap = el('div', { class: 'stack' })
 
+  /** Pourquoi une valeur n'est pas proposée. null = elle l'est. */
+  const blocked = v => {
+    if (spec.distinct && cur.includes(v)) return 'déjà pris'
+    if (spec.maxItems !== undefined && cur.length >= spec.maxItems) return 'complet'
+    if (taken?.()?.has(v)) return 'plus d\'exemplaire disponible'
+    return null
+  }
+
   const draw = () => {
     wrap.replaceChildren()
     if (spec.values) {
-      wrap.append(el('div', { class: 'chips' }, spec.values.map(v =>
-        el('button', { type: 'button', class: 'chip', onclick: () => { cur.push(v); repack(); draw() } }, '+' + v))))
+      wrap.append(el('div', { class: 'chips' }, spec.values.map(v => {
+        const why = blocked(v)
+        return el('button', {
+          type: 'button', class: 'chip' + (why ? ' spent' : ''), disabled: !!why,
+          title: why ? `${v} — ${why}` : `ajouter ${v}`,
+          onclick: () => { if (!blocked(v)) { cur.push(v); repack(); draw() } }
+        }, '+' + v)
+      })))
     } else {
       wrap.append(el('div', { class: 'row' },
         el('button', {
@@ -120,6 +142,8 @@ function list(spec, items, onChange) {
     }
   }
   draw()
+  // l'écran redessine ces pastilles quand un AUTRE joueur prend une carte
+  wrap.refresh = draw
   return wrap
 }
 

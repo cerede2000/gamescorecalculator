@@ -31,6 +31,13 @@ export const api = {
   remove:     id               => call('DELETE', `/api/matches/${id}`)
 }
 
+/** crypto.randomUUID n'existe qu'en contexte sécurisé : en HTTP sur une IP de
+ *  réseau local, il est absent. Un identifiant de commande n'a besoin d'être
+ *  unique que le temps d'une session — la solution de repli suffit. */
+export const uuid = () =>
+  globalThis.crypto?.randomUUID?.() ??
+  `c-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}-${(uuid.n = (uuid.n ?? 0) + 1).toString(36)}`
+
 // ── valeurs ────────────────────────────────────────────────────────────────
 // Une valeur circule sous sa forme canonique, jamais comme un nombre JSON.
 export const INT  = n => ({ type: 'INTEGER', value: String(n) })

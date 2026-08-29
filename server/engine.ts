@@ -5,7 +5,7 @@
 import { score, type Report } from '../packages/rules-core/src/score.ts'
 import { rank, MissingMetric, type Entrant, type RankResult, type Provider } from '../packages/rules-core/src/rank.ts'
 import { evaluate } from '../packages/rules-core/src/formula.ts'
-import { add, parse, canonical, type Maybe, type NumericValue } from '../packages/rules-core/src/numeric.ts'
+import { add, cmp as cmpVals, parse, canonical, type Maybe, type NumericValue } from '../packages/rules-core/src/numeric.ts'
 import type { Bundle, ScoringMode } from '../packages/rules-core/src/bundle.ts'
 import { TABLE_SCOPE } from './store.ts'
 
@@ -30,6 +30,7 @@ export type Question = { metric: string; label: string; ids: string[] }
 /** Le classement refusé faute d'une donnée, avec qui la doit. */
 export type Blocked = { metric: string; ids: string[] }
 export type Trigger = { code: string; label: string; timing: string; mode: string; reversible: boolean; by: string[] }
+export type Notice = { code: string; label: string; level: string; by: string[] }
 
 export type Computed = {
   rounds: RoundReport[]
@@ -39,6 +40,7 @@ export type Computed = {
   question: Question | null
   blocked: Blocked | null
   triggers: Trigger[]
+  notices: Notice[]
 }
 
 export function modeOf(b: Bundle, id: string): ScoringMode {
@@ -97,6 +99,15 @@ export function compute(
     last = byParticipant
   }
 
+  // combien de participants partagent le meilleur cumul — un inconnu ne peut
+  // pas être en tête, il est simplement absent du décompte
+  const known = participants.map(p => totals[p.id]).filter((v): v is NumericValue => v != null)
+  let topCount: Maybe = null
+  if (known.length) {
+    const best = known.reduce((a, b) => ((cmpVals(a, b) ?? 0) >= 0 ? a : b))
+    topCount = I(known.filter(v => cmpVals(v, best) === 0).length)
+  }
+
   // ── les métriques offertes au classement ─────────────────────────────────
   const metrics: Record<string, Record<string, Maybe>> = {}
   for (const p of participants) {
@@ -106,7 +117,8 @@ export function compute(
       roundScore: rep?.total ?? null,
       roundIndex: I(roundNos[roundNos.length - 1]),
       playerCount: I(participants.length),
-      seatIndex: I(p.seat)
+      seatIndex: I(p.seat),
+      topCount
     }
     for (const r of inputs)
       if (r.round === roundNos[roundNos.length - 1] && (r.participant_id === TABLE_SCOPE || r.participant_id === p.id))
@@ -127,6 +139,18 @@ export function compute(
     }).map(p => p.id)
     if (by.length)
       triggers.push({ code: e.code, label: e.label, timing: e.timing, mode: e.mode, reversible: e.reversible ?? false, by })
+  }
+
+  // ── avis : ce qu'il faut dire sans que l'état change ─────────────────────
+  const notices: Notice[] = []
+  for (const n of bundle.scoringEngine.notices ?? []) {
+    const by = participants.filter(p => {
+      try {
+        const v = evaluate(n.when, { inputs: metrics[p.id], derived: {}, collections: {} }).value
+        return v !== null && v.type === 'BOOLEAN' && v.value === 'true'
+      } catch { return false }
+    }).map(p => p.id)
+    if (by.length) notices.push({ code: n.code, label: n.label, level: n.level, by })
   }
 
   // ── classement, et la question de départage s'il en manque une ───────────
@@ -162,7 +186,7 @@ export function compute(
     }
   }
 
-  return { rounds, totals, metrics, ranking, question, blocked, triggers }
+  return { rounds, totals, metrics, ranking, question, blocked, triggers, notices }
 }
 
 export { canonical }

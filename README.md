@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 251 contrôles, aucune dépendance :
+Cinq portes, 264 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
@@ -74,12 +74,43 @@ Cinq portes, 251 contrôles, aucune dépendance :
   partagent la victoire à 20 survivants ; Duncan l'emporte à l'Eau en
   **7 questions de départage au lieu de 16**.
 - **Express et guidée donnent le même rapport**, formule comprise.
+- **Les règles atteignent la saisie.** Un joueur éliminé ne peut plus rien saisir
+  d'autre, les champs solo remplacent les champs multijoueur, la seule carte ×2
+  du paquet ne se prend qu'une fois par manche, et la table ne peut pas déclarer
+  plus de cubes Pierre que la boîte n'en contient.
+
+## Les règles s'appliquent à la saisie
+
+Deux mécaniques, toutes deux en données.
+
+**La pertinence se déduit, elle ne se déclare pas.** Un champ dit déjà quelle
+formule il sert (`usedBy`) et une formule dit déjà quand elle s'applique
+(`when`) : il suffit de laisser cette information atteindre l'écran. Moon
+Colony Bloodbath bascule entre saisie solo et multijoueur sans une ligne
+écrite pour lui. Deux garde-fous : un champ qui figure dans sa propre
+condition ne se désactive jamais lui-même — sinon on ne pourrait plus revenir
+en arrière — et une contribution exclusive écarte tout le reste.
+
+**Le matériel est fini, et cela se déclare.** `scoringEngine.scarcity` porte
+trois formes : `holders` (au plus N joueurs tiennent ce champ), `supply` (la
+somme sur la table ne dépasse pas la réserve) et `copies` (chaque valeur d'une
+collection n'existe qu'en tant d'exemplaires). Une quantité affirmée sans
+source déclenche un avertissement à la publication, et **une valeur dont le
+nombre d'exemplaires n'est pas déclaré n'est pas limitée** : l'oubli laisse
+passer, il ne bloque pas.
+
+Le serveur reste l'autorité : il revérifie la table entière à chaque
+enregistrement, et une valeur devenue sans objet ne compte plus comme du
+matériel tenu — un joueur éliminé ne retient pas la carte des autres. L'écran
+applique les mêmes contrôles **depuis la même source** : Node retire les types
+du noyau à la volée et le sert au navigateur sous `/core/`, ce qui évite d'en
+écrire une seconde version en JavaScript.
 
 ## Les quatre jeux
 
 | Jeu | Joueurs | Saisie express | Départage |
 |---|---|---|---|
-| Flip 7 | 2 à ? | 5 champs par joueur | non confirmé → victoire partagée |
+| Flip 7 | 2 à ? | 5 champs par joueur | manche supplémentaire à 200+ |
 | Akropolis | 2 à 4 | 16 champs par joueur | Pierres, puis victoire partagée |
 | Moon Colony Bloodbath | 1 à 5 | 2 champs par joueur | aucun → victoire partagée |
 | Dune: Imperium | 1 à 4 | 1 champ par joueur | Épice, Solaris, Eau, Troupes |

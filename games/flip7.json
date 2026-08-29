@@ -36,16 +36,40 @@
     },
     {
       "id": "finalTiebreak",
-      "status": "unconfirmed",
-      "question": "Comment départager deux joueurs au même score cumulé ?",
+      "status": "confirmed",
       "options": [
-        "sharedVictory",
-        "mostFlip7",
-        "fewestBusts"
+        "extraRound"
       ],
-      "provisional": "sharedVictory",
+      "provisional": "extraRound",
       "affectsScore": false,
-      "source": null
+      "source": "détenteur des règles, 2026-08-29",
+      "rationale": "En cas d'égalité à 200 points ou plus en fin de manche, on joue une manche supplémentaire pour départager."
+    },
+    {
+      "id": "zeroCardCopies",
+      "status": "unconfirmed",
+      "question": "Combien d'exemplaires de la carte 0 le paquet contient-il ? La règle « la carte N existe en N exemplaires » ne dit rien de zéro.",
+      "options": [
+        "1",
+        "unknown"
+      ],
+      "provisional": "unlimited",
+      "affectsScore": false,
+      "source": null,
+      "rationale": "Faute de nombre confirmé, la carte 0 n'est pas limitée à la saisie."
+    },
+    {
+      "id": "bonusCardCopies",
+      "status": "unconfirmed",
+      "question": "Combien d'exemplaires de chaque carte bonus (+2, +4, +6, +8, +10) le paquet contient-il ?",
+      "options": [
+        "oneEach",
+        "unknown"
+      ],
+      "provisional": "unlimited",
+      "affectsScore": false,
+      "source": null,
+      "rationale": "Faute de nombres confirmés, les bonus ne sont pas limités à la saisie, contrairement au ×2."
     }
   ],
   "ui": {
@@ -152,7 +176,8 @@
               12
             ],
             "control": "chips",
-            "help": "i18n:f7.cards.help"
+            "help": "i18n:f7.cards.help",
+            "distinct": true
           },
           {
             "id": "bonuses",
@@ -315,18 +340,37 @@
         "reversible": true,
         "explain": "i18n:f7.end.threshold.explain",
         "when": {
-          "op": "gte",
-          "left": {
-            "op": "ref",
-            "id": "cumulative"
-          },
-          "right": {
-            "op": "lit",
-            "value": {
-              "type": "INTEGER",
-              "value": "200"
+          "op": "and",
+          "args": [
+            {
+              "op": "gte",
+              "left": {
+                "op": "ref",
+                "id": "cumulative"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "200"
+                }
+              }
+            },
+            {
+              "op": "eq",
+              "left": {
+                "op": "ref",
+                "id": "topCount"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "1"
+                }
+              }
             }
-          }
+          ]
         }
       }
     ],
@@ -341,7 +385,83 @@
       "missingPolicy": "BLOCK",
       "rankMode": "COMPETITION",
       "remainingTie": "DECLARED_TIE"
-    }
+    },
+    "notices": [
+      {
+        "code": "tieAtThreshold",
+        "label": "i18n:f7.notice.tieAtThreshold",
+        "level": "info",
+        "when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "gte",
+              "left": {
+                "op": "ref",
+                "id": "cumulative"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "200"
+                }
+              }
+            },
+            {
+              "op": "gt",
+              "left": {
+                "op": "ref",
+                "id": "topCount"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "1"
+                }
+              }
+            }
+          ]
+        },
+        "source": "détenteur des règles, 2026-08-29"
+      }
+    ],
+    "scarcity": [
+      {
+        "id": "numberCardCopies",
+        "label": "i18n:f7.cards",
+        "kind": "copies",
+        "target": "cards",
+        "byValue": {
+          "1": 1,
+          "2": 2,
+          "3": 3,
+          "4": 4,
+          "5": 5,
+          "6": 6,
+          "7": 7,
+          "8": 8,
+          "9": 9,
+          "10": 10,
+          "11": 11,
+          "12": 12
+        },
+        "usedBy": "derive:numberSum",
+        "message": "i18n:f7.scarcity.cards",
+        "source": "détenteur des règles, 2026-08-29 : la carte N existe en N exemplaires"
+      },
+      {
+        "id": "x2Card",
+        "label": "i18n:f7.x2",
+        "kind": "holders",
+        "target": "x2",
+        "limit": 1,
+        "usedBy": "formula:round.numbers",
+        "message": "i18n:f7.scarcity.x2",
+        "source": "détenteur des règles, 2026-08-29 : le paquet ne contient qu'une carte ×2"
+      }
+    ]
   },
   "fixtures": [
     "flip7-demo-3p",

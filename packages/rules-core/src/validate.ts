@@ -16,7 +16,8 @@ export const CORE_METRICS = new Set([
   'roundScore',    // score de la manche courante
   'roundIndex',    // numéro de la manche
   'playerCount',   // nombre de participants
-  'seatIndex'      // position du participant, parfois critère de départage
+  'seatIndex',     // position du participant, parfois critère de départage
+  'topCount'       // combien de participants partagent le meilleur cumul
 ])
 
 function walk(n: Node, fn: (x: Node) => void): void {
@@ -80,6 +81,8 @@ export function validate(b: Bundle): Issue[] {
     ...(eng.tieBreakers ?? []).map(c => `tiebreak:${c.metric}`)
   ])
 
+  const allDeriveTargets = new Set(eng.modes.flatMap(m => (m.derive ?? []).map(d => `derive:${d.id}`)))
+
   const express = eng.modes.find(m => m.id === 'express')
   const guided = eng.modes.find(m => m.id === 'guided')
   if (!express) err('EF-050', 'aucun mode express — il doit être proposé par défaut')
@@ -121,6 +124,7 @@ export function validate(b: Bundle): Issue[] {
       check(c.value, `valeur de ${c.code}`)
     }
     for (const e of eng.endConditions ?? []) check(e.when, `fin ${e.code}`)
+    for (const n of eng.notices ?? []) check(n.when, `avis ${n.code}`)
 
     // ── EC-03 · une collection déclarée justifie son existence et décrit sa saisie ──
     for (const c of m.collections ?? []) {
@@ -160,6 +164,42 @@ export function validate(b: Bundle): Issue[] {
   for (const c of [...eng.ranking.criteria, ...(eng.tieBreakers ?? [])])
     if (c.acquire !== 'onDemand' && !producible.has(c.metric))
       err('EF-110', `critère de classement « ${c.metric} » ne correspond à aucune métrique produite`)
+
+  // ── matériel fini : une limite doit désigner quelque chose et citer sa source ──
+  for (const sc of eng.scarcity ?? []) {
+    const field = eng.modes.flatMap(m => m.inputs).find(f => f.id === sc.target)
+    const col = eng.modes.flatMap(m => m.collections ?? []).find(c => c.id === sc.target)
+
+    if (!sc.message) err('EC-03', `limite de matériel « ${sc.id} » sans message affichable`)
+    if (!sc.usedBy || (!targets.has(sc.usedBy) && !allDeriveTargets.has(sc.usedBy)))
+      err('EC-03', `limite de matériel « ${sc.id} » : usedBy « ${sc.usedBy} » ne désigne rien d'existant`)
+    if (sc.source === undefined || sc.source === null)
+      warn('EC-05', `limite de matériel « ${sc.id} » sans source citée : une quantité affirmée sans livret est une invention`)
+
+    if (sc.kind === 'holders' || sc.kind === 'supply') {
+      if (!field) { err('EC-03', `limite « ${sc.id} » : le champ « ${sc.target} » n'existe dans aucun mode`); continue }
+      if (sc.kind === 'holders' && field.type !== 'BOOLEAN')
+        err('EC-03', `limite « ${sc.id} » compte des détenteurs d'un champ ${field.type} : un booléen est attendu`)
+      if (sc.kind === 'supply' && field.type !== 'INTEGER')
+        err('EC-03', `limite « ${sc.id} » somme un champ ${field.type} : un entier est attendu`)
+      if (!field.scope.startsWith('PARTICIPANT'))
+        err('EC-03', `limite « ${sc.id} » porte sur un champ de portée ${field.scope} : le matériel se répartit entre participants`)
+      if (sc.limit === undefined)
+        err('EC-03', `limite « ${sc.id} » sans plafond déclaré`)
+    } else {
+      if (!col) { err('EC-03', `limite « ${sc.id} » : la collection « ${sc.target} » n'est déclarée dans aucun mode`); continue }
+      if (col.kind !== 'valueList')
+        err('EC-03', `limite « ${sc.id} » compte des exemplaires dans une collection ${col.kind} : valueList attendue`)
+      if (!sc.byValue || !Object.keys(sc.byValue).length)
+        err('EC-03', `limite « ${sc.id} » sans nombre d'exemplaires par valeur`)
+      for (const [k, n] of Object.entries(sc.byValue ?? {})) {
+        if (!Number.isInteger(Number(k))) err('EC-03', `limite « ${sc.id} » : clé « ${k} » non entière`)
+        if (!Number.isInteger(n) || n < 1) err('EC-03', `limite « ${sc.id} » : ${n} exemplaires de « ${k} »`)
+        if (col.values && !col.values.includes(Number(k)))
+          err('EC-03', `limite « ${sc.id} » : la valeur ${k} n'appartient pas à l'ensemble déclaré de « ${col.id} »`)
+      }
+    }
+  }
 
   // ── EC-09 · parties de référence ──────────────────────────────────────────
   if ((b.fixtures ?? []).length < 3)

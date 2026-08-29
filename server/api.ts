@@ -2,9 +2,14 @@
 // recalcule tout ce qu'il rend, et n'accorde aucune confiance au client.
 
 import { Router, HttpError, type Ctx } from './http.ts'
+import { readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { stripTypeScriptTypes } from 'node:module'
 import { Store, TABLE_SCOPE } from './store.ts'
 import { Catalogue } from './catalogue.ts'
 import { compute, modeOf } from './engine.ts'
+import { checkEntry, checkRound, type Entry as CEntry } from '../packages/rules-core/src/constraints.ts'
+import { relevance } from '../packages/rules-core/src/relevance.ts'
 import { canonical, parse, type Maybe, type NumericValue } from '../packages/rules-core/src/numeric.ts'
 import type { Bundle, Field, CollectionSpec } from '../packages/rules-core/src/bundle.ts'
 
@@ -78,6 +83,28 @@ function coerceCollection(c: CollectionSpec, raw: unknown): [number, number][] {
 const isTableScope = (f: Field) => f.scope === 'GAME' || f.scope === 'ROUND'
 
 export function mount(app: Router, store: Store, cat: Catalogue, clientDir: string): Router {
+
+  // ── le noyau, servi au navigateur ─────────────────────────────────────────
+  // L'écran doit désactiver les champs devenus sans objet et griser le matériel
+  // déjà pris. C'est exactement ce que le serveur calcule. Plutôt que de le
+  // réécrire en JavaScript et de le laisser dériver, on sert la même source :
+  // Node sait retirer les types, le navigateur reçoit du JavaScript valide.
+  const coreDir = join(clientDir, '..', 'packages', 'rules-core', 'src')
+  const core = new Map<string, string>()
+  for (const f of readdirSync(coreDir))
+    if (f.endsWith('.ts'))
+      core.set(f, stripTypeScriptTypes(readFileSync(join(coreDir, f), 'utf8'), { mode: 'strip' }))
+
+  app.get('/core/:file', (c: Ctx) => {
+    const js = core.get(c.params.file)
+    if (js === undefined) throw new HttpError(404, 'module inconnu')
+    c.res.writeHead(200, {
+      'content-type': 'text/javascript; charset=utf-8',
+      'content-length': Buffer.byteLength(js),
+      'cache-control': 'no-cache'
+    })
+    c.res.end(js)
+  })
 
   // ── lecture ───────────────────────────────────────────────────────────────
   app.get('/api/health', () => ({
@@ -183,6 +210,22 @@ export function mount(app: Router, store: Store, cat: Catalogue, clientDir: stri
           store.putCollection(m.id, round, pid, cid, JSON.stringify(coerceCollection(spec, raw)))
         }
       }
+      // le matériel est fini : la table entière est revérifiée, saisie comprise.
+      // Un dépassement annule l'écriture — la transaction n'est pas validée.
+      const entries = roundEntries(m.id, round, b, mode)
+      const names = new Map(store.participants(m.id).map(p => [p.id, p.name]))
+      const nameOf = (id: string) => names.get(id) ?? id
+      const breaches = [
+        ...Object.values(entries).flatMap(e => checkEntry(mode, e)),
+        ...checkRound(b, mode, entries, nameOf)
+      ]
+      if (breaches.length) {
+        const first = breaches[0]
+        throw new HttpError(409,
+          `${cat.t(m.locale, first.message) || cat.t(m.locale, first.label)} — ${first.detail}`,
+          breaches.map(x => ({ ...x, message: cat.t(m.locale, x.message), label: cat.t(m.locale, x.label) })))
+      }
+
       if (!store.bumpVersion(m.id, m.version, at)) throw new HttpError(409, 'partie modifiée entre-temps')
       store.append(m.id, 'RoundRecorded', { round, players: Object.keys(byPlayer).length }, at)
     })
@@ -304,6 +347,37 @@ export function mount(app: Router, store: Store, cat: Catalogue, clientDir: stri
     return result
   }
 
+  /** L'état d'une manche, participant par participant, tel que les contrôles
+   *  de matériel l'attendent. Les champs de portée table en sont exclus :
+   *  le matériel se répartit entre les joueurs, il n'appartient pas à la table. */
+  function roundEntries(
+    matchId: string, round: number, bundle: Bundle, mode: ReturnType<typeof modeOf>
+  ): Record<string, CEntry> {
+    const out: Record<string, CEntry> = {}
+    const table: Record<string, Maybe> = {}
+    for (const p of store.participants(matchId)) out[p.id] = { values: {}, collections: {} }
+
+    for (const r of store.inputs(matchId)) {
+      if (r.round !== round) continue
+      const v = r.value === null ? null : parse(r.value)
+      if (r.participant_id === TABLE_SCOPE) table[r.field_id] = v
+      else if (out[r.participant_id]) out[r.participant_id].values[r.field_id] = v
+    }
+    for (const r of store.collections(matchId))
+      if (r.round === round && out[r.participant_id])
+        out[r.participant_id].collections[r.collection_id] = JSON.parse(r.items)
+
+    // Une valeur devenue non pertinente ne décrit plus la table : un joueur
+    // éliminé ne « tient » plus la carte qu'il avait cochée avant de l'être.
+    for (const [pid, e] of Object.entries(out)) {
+      const rel = relevance(bundle, mode, { ...table, ...e.values },
+        Object.fromEntries(Object.entries(e.collections).map(([k, items]) => [k, items.map(([a, b]) => ({ k: a, v: b }))])))
+      for (const k of Object.keys(e.values)) if (rel.enabled[k] === false) delete e.values[k]
+      for (const k of Object.keys(e.collections)) if (rel.enabled[k] === false) delete e.collections[k]
+    }
+    return out
+  }
+
   function state(id: string) {
     const m = need(id)
     const entry = cat.get(m.game_id)
@@ -356,6 +430,7 @@ export function mount(app: Router, store: Store, cat: Catalogue, clientDir: stri
       question: c.question,
       blocked: c.blocked,
       triggers: c.triggers,
+      gameNotices: c.notices,
       tiebreaks: answers,
       notes: entry.issues.filter(i => i.severity === 'warning').map(i => i.message)
     }

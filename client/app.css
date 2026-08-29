@@ -124,6 +124,10 @@ button, input, select { font: inherit; color: inherit; }
 .seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: var(--shadow); }
 
 .field { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 9px 0; border-bottom: 1px dashed var(--rule); }
+.field.moot > .lab, .field.moot > .help { opacity: .5; }
+.field .moot-why { font-size: 12px; color: var(--wood); font-style: italic; }
+.off { opacity: .42; }
+.off input, .off button { cursor: not-allowed; }
 .field:last-child { border-bottom: 0; }
 .field > label, .field > .lab { font-size: 14px; font-weight: 500; }
 .field > input[type="text"] { align-self: stretch; }
@@ -154,6 +158,8 @@ button, input, select { font: inherit; color: inherit; }
   padding: 5px 12px; cursor: pointer; font-family: var(--mono); font-size: 14px;
 }
 .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.chip.spent { opacity: .34; cursor: not-allowed; text-decoration: line-through; }
+.chip:disabled { cursor: not-allowed; }
 .chip.removable::after { content: " ×"; color: var(--ink-faint); }
 
 input[type="text"], input[type="number"] {
