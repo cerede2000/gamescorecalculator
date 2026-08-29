@@ -446,12 +446,19 @@ section('Mise en place : les quantités suivent la table')
   ok('Dune à deux : hors périmètre, et l\'écran dit pourquoi',
      du2.available === false && typeof du2.notice === 'string' && du2.notice.length > 0)
 
-  const mcb = await sheet('moon-colony-bloodbath', 3)
-  ok('Moon Colony : aucune fiche, et le motif est affiché',
-     mcb.available === false && (mcb.notice ?? '').includes('livret'))
+  const mcb1 = await sheet('moon-colony-bloodbath', 1)
+  const mcb3 = await sheet('moon-colony-bloodbath', 3)
+  ok('Moon Colony solo : la carte Loneliness rejoint le paquet Progrès',
+     mcb1.steps.some((s: any) => s.id === 'progressSolo') && !mcb1.steps.some((s: any) => s.id === 'progress'))
+  ok('à plusieurs, elle en est écartée',
+     mcb3.steps.some((s: any) => s.id === 'progress') && !mcb3.steps.some((s: any) => s.id === 'progressSolo'))
+  ok('les cinq jeux ont une fiche à trois joueurs',
+     (await Promise.all(readdirSync('games').map(async f => {
+       const b = JSON.parse(readFileSync(`games/${f}`, 'utf8'))
+       return (await sheet(b.gameId, 3)).available
+     }))).every(Boolean))
 
   // toute étape publiée cite sa source
-  const { readFileSync } = await import('node:fs')
   let sans = 0, total = 0
   for (const f of readdirSync('games')) {
     const b = JSON.parse(readFileSync(`games/${f}`, 'utf8'))

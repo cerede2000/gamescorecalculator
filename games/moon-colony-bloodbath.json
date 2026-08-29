@@ -38,8 +38,209 @@
     }
   ],
   "setupAssistant": {
-    "enabled": false,
-    "missingNotice": "Le livret de Moon Colony Bloodbath n'est pas à disposition : aucune fiche de mise en place n'a été rédigée plutôt que d'en inventer une. Le décompte, lui, est complet."
+    "enabled": true,
+    "steps": [
+      {
+        "id": "buildings",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Mélanger le paquet de Bâtiments",
+        "quantities": [
+          {
+            "label": "Cartes Bâtiment",
+            "value": 90,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "deal",
+        "scope": "PER_PLAYER",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Recevoir sa main de départ",
+        "quantities": [
+          {
+            "label": "Cartes Bâtiment",
+            "value": 4,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "playmat",
+        "scope": "PER_PLAYER",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Choisir un scientifique et prendre sa Base lunaire",
+        "body": "Les scientifiques sont identiques. Posez sur le plateau les habitants, l'argent et la nourriture de départ.",
+        "quantities": [
+          {
+            "label": "Habitants",
+            "value": 30
+          },
+          {
+            "label": "Argent",
+            "value": 4
+          },
+          {
+            "label": "Nourriture",
+            "value": 4
+          }
+        ]
+      },
+      {
+        "id": "perks",
+        "scope": "PER_PLAYER",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Prendre ses Perks et ses jetons Action",
+        "body": "Les Perks sont propres à votre scientifique : laissez-les en pile face visible dans votre zone.",
+        "quantities": [
+          {
+            "label": "Perks",
+            "value": 5,
+            "unit": "cartes"
+          },
+          {
+            "label": "Jetons Action",
+            "value": 4
+          }
+        ]
+      },
+      {
+        "id": "progress",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "when": {
+          "op": "gt",
+          "left": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "1"
+            }
+          }
+        },
+        "title": "Constituer le paquet Progrès",
+        "body": "Mélangez les Twists et révélez-en 2. Pour une première partie, prenez les deux Twists dont le mot « Twist » est écrit en blanc : ils sont plus simples. Tout le monde les étudie, puis on les mélange avec les cartes de départ. La carte Loneliness ne sert qu'à la variante solitaire.",
+        "quantities": [
+          {
+            "label": "Twists révélés",
+            "value": 2,
+            "unit": "cartes"
+          },
+          {
+            "label": "Trouble",
+            "value": 2,
+            "unit": "cartes"
+          },
+          {
+            "label": "Work",
+            "value": 4,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "progressSolo",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 8, One Player Variant",
+        "when": {
+          "op": "eq",
+          "left": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "1"
+            }
+          }
+        },
+        "title": "Constituer le paquet Progrès — avec Loneliness",
+        "body": "La mise en place est celle d'une partie normale, mais on ajoute la carte Loneliness aux cartes de départ.",
+        "quantities": [
+          {
+            "label": "Twists révélés",
+            "value": 2,
+            "unit": "cartes"
+          },
+          {
+            "label": "Trouble",
+            "value": 2,
+            "unit": "cartes"
+          },
+          {
+            "label": "Work",
+            "value": 4,
+            "unit": "cartes"
+          },
+          {
+            "label": "Loneliness",
+            "value": 1,
+            "unit": "carte"
+          }
+        ]
+      },
+      {
+        "id": "twistToken",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Poser le jeton Twist sur le paquet Twist"
+      },
+      {
+        "id": "robots",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Mélanger les Robots et poser leur jeton dessus",
+        "quantities": [
+          {
+            "label": "Cartes Robot",
+            "value": 20,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "developments",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Ranger les Developments en pile face visible",
+        "body": "Triés, à portée de main.",
+        "quantities": [
+          {
+            "label": "Cartes Development",
+            "value": 20,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "events",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Ranger les Events face visible, triés par numéro",
+        "body": "Le plus petit numéro sur le dessus.",
+        "quantities": [
+          {
+            "label": "Cartes Event",
+            "value": 13,
+            "unit": "cartes"
+          }
+        ]
+      },
+      {
+        "id": "supply",
+        "scope": "TABLE",
+        "source": "Official Instruction Manual, Rio Grande Games 2024, p. 3",
+        "title": "Laisser la réserve sur la table",
+        "body": "L'argent, la nourriture et les habitants restants, ainsi que les caisses. Le jeu n'est pas limité par le matériel : s'il manque un jeton, remplacez-le."
+      }
+    ]
   },
   "ui": {
     "layout": "playerGrid",

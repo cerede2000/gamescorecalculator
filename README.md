@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 346 contrôles, aucune dépendance :
+Cinq portes, 348 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
@@ -156,6 +156,8 @@ du noyau à la volée et le sert au navigateur sous `/core/`, ce qui évite d'en
 Règles vérifiées contre les livrets officiels, sauf Flip 7 dont seule une
 synthèse de deux pages est disponible.
 
+**Les cinq jeux ont une fiche de mise en place.**
+
 Ark Nova ne demande que deux nombres : l'attrait, et la **valeur écrite en
 blanc** sur la case du marqueur de conservation. C'est exactement ce que le
 livret demande de faire, et c'est tout le décompte. L'exemple du livret est
@@ -163,9 +165,11 @@ une partie de référence : 24+80 = 104 contre 30+78 = 108, et le joueur qui a
 deux points d'attrait de moins l'emporte.
 
 Une réserve y est déclarée plutôt que comblée : la table complète de la piste
-de conservation n'est pas lisible dans le livret, qui n'en montre que deux
-points. L'application demande donc la valeur lue sur le plateau au lieu de la
-position du marqueur, et la question reste affichée dans la partie.
+de conservation n'est pas dans le livret, qui n'en montre que deux points. Les
+images du PDF sont en 150 ppi et le plateau y tient en quelques centaines de
+pixels : la table n'y est pas récupérable, ce n'est pas une question de zoom.
+L'application demande donc la valeur lue sur le plateau au lieu de la position
+du marqueur, et la question reste affichée dans la partie.
 
 ## Ce qu'il y a dans le dépôt
 
@@ -214,7 +218,7 @@ des quantités qui **dépendent de la configuration**.
 | Ark Nova | 15 | le solo remplace le pion Pause par la tuile Solo, l'attrait de départ passe de 0·1·2·3 à 20 |
 | Dune: Imperium | 12 | le disque de Score démarre sur 1 à quatre joueurs, sur 0 sinon |
 | Flip 7 | 2 | rien — mélanger, distribuer une carte |
-| Moon Colony Bloodbath | — | aucune fiche : le livret n'est pas à disposition, et l'écran le dit |
+| Moon Colony Bloodbath | 11 | le solitaire ajoute la carte Loneliness au paquet Progrès |
 
 Trois formes de quantité : un nombre fixe, une **expression** évaluée sur les
 métriques de cœur, ou une valeur **par siège** rendue avec le nom de chaque
@@ -223,7 +227,7 @@ solo d'Ark Nova échange trois étapes sans dupliquer les douze autres.
 
 La porte de publication refuse un assistant déclaré actif et vide, un
 assistant inactif sans motif affiché, et avertit sur toute étape sans source —
-une mise en place affirmée sans livret est une invention. Les 36 étapes
+une mise en place affirmée sans livret est une invention. Les 47 étapes
 publiées citent toutes la leur.
 
 Les coches de progression vivent dans le navigateur : c'est un rituel de début
