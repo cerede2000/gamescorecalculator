@@ -1,0 +1,16 @@
+{
+  "game": "ark-nova",
+  "mode": "express",
+  "label": "Exemple du livret — Bleu 24+80=104, Rouge 30+78=108",
+  "participants": [{ "id": "bleu", "name": "Bleu" }, { "id": "rouge", "name": "Rouge" }],
+  "rounds": [{
+    "bleu":  { "appeal": { "type": "INTEGER", "value": "80" }, "conservationValue": { "type": "INTEGER", "value": "24" } },
+    "rouge": { "appeal": { "type": "INTEGER", "value": "78" }, "conservationValue": { "type": "INTEGER", "value": "30" } }
+  }],
+  "expect": {
+    "totals": { "bleu": 104, "rouge": 108 },
+    "ranks": { "rouge": 1, "bleu": 2 },
+    "questions": 0
+  },
+  "note": "Livret p.19 : Bleu occupe la case 16 de la piste de conservation (valeur 24) avec 80 d'attrait ; Rouge la case 18 (valeur 30) avec 78 d'attrait. Le moins d'attrait l'emporte grâce à la conservation — c'est tout le sel du jeu."
+}

@@ -60,7 +60,9 @@ await ready()
 console.log(b('\nTablée — parties de référence rejouées à travers l\'API HTTP\n'))
 
 const health = await call('GET', '/api/health')
-ok(`catalogue chargé : ${health.games} jeux, ${health.refused.length} écarté(s)`, health.games === 4 && health.refused.length === 0)
+const bundles = readdirSync('games').filter(f => f.endsWith('.json')).length
+ok(`catalogue chargé : ${health.games} jeux sur ${bundles} bundles, ${health.refused.length} écarté(s)`,
+   health.games === bundles && health.refused.length === 0)
 
 for (const file of readdirSync('fixtures').sort()) {
   const fx = JSON.parse(readFileSync(`fixtures/${file}`, 'utf8'))
@@ -358,6 +360,54 @@ section('Égalité à 200 : on joue une manche supplémentaire')
      N(st.totals.a) === 222 && N(st.totals.b) === 210)
 }
 // ── corriger et supprimer une manche ──────────────────────────────────────
+section('Ark Nova : la conservation devant l\'attrait')
+{
+  const play = async (players: { id: string; appeal: number; conservation: number }[]) => {
+    let st = await call('POST', '/api/matches', {
+      gameId: 'ark-nova', mode: 'express',
+      players: players.map(p => ({ id: p.id, name: p.id }))
+    })
+    st = await call('PUT', `/api/matches/${st.match.id}/rounds/1`, {
+      expectedVersion: st.match.version,
+      inputs: Object.fromEntries(players.map(p =>
+        [p.id, { values: { appeal: p.appeal, conservationValue: p.conservation } }]))
+    })
+    return st
+  }
+
+  // l'exemple du livret : moins d'attrait, mais plus de conservation
+  let st = await play([{ id: 'bleu', appeal: 80, conservation: 24 }, { id: 'rouge', appeal: 78, conservation: 30 }])
+  ok('24+80 = 104 et 30+78 = 108', N(st.totals.bleu) === 104 && N(st.totals.rouge) === 108)
+  st = await call('POST', `/api/matches/${st.match.id}/finish`, { expectedVersion: st.match.version })
+  ok('Rouge gagne avec deux points d\'attrait de moins', st.ranking.standings[0].id === 'rouge')
+
+  // le départage ne dérange que les joueurs concernés
+  st = await play([
+    { id: 'ana', appeal: 72, conservation: 26 },
+    { id: 'bo', appeal: 80, conservation: 18 },
+    { id: 'cy', appeal: 60, conservation: 24 }
+  ])
+  st = await call('POST', `/api/matches/${st.match.id}/finish`, { expectedVersion: st.match.version })
+  ok('à 98 partout, la question porte sur les projets de conservation',
+     st.question?.metric === 'conservationProjects')
+  ok('et ne s\'adresse qu\'aux deux joueurs à égalité',
+     JSON.stringify(st.question.ids.sort()) === '["ana","bo"]', JSON.stringify(st.question?.ids))
+  st = await call('POST', `/api/matches/${st.match.id}/tiebreak`, {
+    expectedVersion: st.match.version, metric: 'conservationProjects', values: { ana: 5, bo: 7 }
+  })
+  ok('deux questions ont suffi', st.ranking.questionsAsked === 2 && st.ranking.standings[0].id === 'bo')
+
+  // le seuil solo
+  const gagne = await play([{ id: 'solo', appeal: 78, conservation: 24 }])
+  ok('solo à 102 : la victoire est annoncée',
+     gagne.gameNotices.some((n: any) => n.code === 'soloWin'), JSON.stringify(gagne.gameNotices))
+  const perdu = await play([{ id: 'solo', appeal: 60, conservation: 20 }])
+  ok('solo à 80 : la défaite est annoncée',
+     perdu.gameNotices.some((n: any) => n.code === 'soloLoss'))
+  const duo = await play([{ id: 'a', appeal: 60, conservation: 20 }, { id: 'b', appeal: 50, conservation: 10 }])
+  ok('à deux, aucun avis solo', duo.gameNotices.length === 0, JSON.stringify(duo.gameNotices))
+}
+
 section('Revenir sur une manche')
 {
   const mk = () => call('POST', '/api/matches', {

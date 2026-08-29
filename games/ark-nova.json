@@ -1,0 +1,128 @@
+{
+  "gameId": "ark-nova",
+  "version": "1.0.0",
+  "contract": "1.0",
+  "name": { "fr": "Ark Nova", "en": "Ark Nova" },
+  "rulesVersion": { "label": "livret officiel FR, impression 05/2023 v2.0", "confirmed": true },
+  "playerCountRules": { "min": 1, "max": 4 },
+  "locales": ["fr"],
+  "policies": [
+    {
+      "id": "conservationTrackTable",
+      "status": "unconfirmed",
+      "question": "Quelle est la table complète de la piste de conservation, case par case, jusqu'à sa valeur en blanc ? Le livret n'en montre que deux points : la case 16 vaut 24, la case 18 vaut 30.",
+      "options": ["readFromBoard", "fullTable"],
+      "provisional": "readFromBoard",
+      "affectsScore": false,
+      "source": null,
+      "rationale": "Faute de table, l'application demande la valeur en blanc plutôt que la position du marqueur — ce que le livret demande déjà au joueur de faire."
+    },
+    {
+      "id": "finalTiebreak",
+      "status": "confirmed",
+      "options": ["conservationProjects"],
+      "provisional": "conservationProjects",
+      "affectsScore": false,
+      "source": "livret p.19 : « le joueur ex-aequo qui a soutenu le plus de projets de conservation l'emporte […] S'il y a encore égalité, la victoire est partagée »",
+      "rationale": "Départage aux projets de conservation soutenus, puis victoire partagée."
+    }
+  ],
+  "scopeNotes": [
+    {
+      "id": "endTrigger",
+      "kind": "productScope",
+      "text": "La fin de partie se déclenche quand vos marqueurs de conservation et d'attrait se trouvent dans la même zone de décompte ou se sont croisés. Cette zone se lit sur le plateau ; l'application ne la modélise pas et ne prévient donc pas de la fin. Elle compte quand la partie est finie.",
+      "source": "livret p.19 : « La zone de décompte est l'espace formé par une case de la piste de conservation et toutes les cases de la piste d'attrait qui lui sont associées »"
+    }
+  ],
+  "setupAssistant": { "enabled": true },
+  "ui": { "layout": "playerGrid", "fieldsPerPlayer": 2 },
+  "scoringEngine": {
+    "modes": [
+      {
+        "id": "express",
+        "default": true,
+        "inputs": [
+          {
+            "id": "appeal",
+            "label": "i18n:an.appeal",
+            "type": "INTEGER",
+            "min": 0,
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "required": true,
+            "usedBy": "formula:final.appeal",
+            "help": "i18n:an.appeal.help"
+          },
+          {
+            "id": "conservationValue",
+            "label": "i18n:an.conservationValue",
+            "type": "INTEGER",
+            "min": 0,
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "required": true,
+            "usedBy": "formula:final.conservation",
+            "help": "i18n:an.conservationValue.help"
+          }
+        ]
+      }
+    ],
+    "contributions": [
+      {
+        "code": "final.appeal",
+        "label": "i18n:an.line.appeal",
+        "value": { "op": "ref", "id": "appeal" }
+      },
+      {
+        "code": "final.conservation",
+        "label": "i18n:an.line.conservation",
+        "value": { "op": "ref", "id": "conservationValue" }
+      }
+    ],
+    "notices": [
+      {
+        "code": "soloWin",
+        "label": "i18n:an.notice.soloWin",
+        "level": "info",
+        "when": {
+          "op": "and",
+          "args": [
+            { "op": "eq", "left": { "op": "ref", "id": "playerCount" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "1" } } },
+            { "op": "gte", "left": { "op": "ref", "id": "cumulative" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "100" } } }
+          ]
+        },
+        "source": "livret p.19, mode solo : « Si vous avez au moins 100 points de victoire après le décompte final […] alors vous gagnez la partie »"
+      },
+      {
+        "code": "soloLoss",
+        "label": "i18n:an.notice.soloLoss",
+        "level": "warn",
+        "when": {
+          "op": "and",
+          "args": [
+            { "op": "eq", "left": { "op": "ref", "id": "playerCount" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "1" } } },
+            { "op": "lt", "left": { "op": "ref", "id": "cumulative" }, "right": { "op": "lit", "value": { "type": "INTEGER", "value": "100" } } }
+          ]
+        },
+        "source": "livret p.19, mode solo"
+      }
+    ],
+    "ranking": {
+      "scope": "PARTICIPANT",
+      "criteria": [{ "metric": "cumulative", "direction": "DESC" }],
+      "missingPolicy": "BLOCK",
+      "rankMode": "COMPETITION",
+      "remainingTie": "SHARED_WIN"
+    },
+    "tieBreakers": [
+      {
+        "metric": "conservationProjects",
+        "direction": "DESC",
+        "acquire": "onDemand",
+        "label": "i18n:an.tb.projects"
+      }
+    ]
+  },
+  "fixtures": ["arknova-livret-2p", "arknova-tiebreak-3p", "arknova-solo"]
+}

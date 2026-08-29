@@ -4,7 +4,7 @@ Assistant de comptage de points pour jeux de société. L'application **prépare
 table, puis compte**. Entre les deux, la partie se joue physiquement et
 l'application n'en sait rien.
 
-La thèse tient en une phrase : **un jeu est une donnée, pas du code.** Les quatre
+La thèse tient en une phrase : **un jeu est une donnée, pas du code.** Les cinq
 jeux du catalogue sont des fichiers JSON chargés à l'exécution. Le cœur ne
 contient aucun terme de jeu, aucune valeur codée en dur, aucun import de jeu —
 c'est vérifié à chaque intégration.
@@ -47,19 +47,19 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 292 contrôles, aucune dépendance :
+Cinq portes, 333 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
 | `npm run validate` | la porte de publication refuse un bundle non conforme |
-| `npm run play` | les treize parties de référence, jouées par le noyau |
+| `npm run play` | les seize parties de référence, jouées par le noyau |
 | `npm run e2e` | les mêmes parties, rejouées **à travers l'API HTTP** |
 | `npm run p0` | l'arithmétique exacte et le classement |
 | `npm run p0b` | le langage de formules et son explication |
 
 ## Ce que ces commandes prouvent
 
-- **Un jeu est une donnée.** Les quatre bundles sont du JSON chargé à
+- **Un jeu est une donnée.** Les cinq bundles sont du JSON chargé à
   l'exécution ; l'intégration continue échoue si un terme de jeu apparaît dans
   le noyau, fût-ce en commentaire.
 - **La porte de publication est réelle.** Un champ sans `usedBy` est refusé, une
@@ -111,6 +111,7 @@ Ce que chaque jeu y gagne :
 | Flip 7 | éliminé → plus rien d'autre à saisir | carte N en N exemplaires, une carte 0, un ×2, un de chaque bonus, 30 points de bonus en tout, pas de doublon chez un joueur |
 | Moon Colony Bloodbath | solo ↔ multijoueur, variante longue, objectif atteint | rien de confirmé |
 | Akropolis | rien à masquer : les cinq catégories comptent toujours | 40 cubes Pierre, et une Cité bornée par le nombre de tuiles en jeu |
+| Ark Nova | rien à masquer : deux nombres, tous deux nécessaires | rien de confirmé |
 
 Akropolis est le seul jeu à déclarer qu'une case vide vaut zéro : deux cases
 suffisent à compter un joueur qui n'a que des Habitations.
@@ -142,7 +143,7 @@ applique les mêmes contrôles **depuis la même source** : Node retire les type
 du noyau à la volée et le sert au navigateur sous `/core/`, ce qui évite d'en
 écrire une seconde version en JavaScript.
 
-## Les quatre jeux
+## Les cinq jeux
 
 | Jeu | Joueurs | Saisie express | Départage |
 |---|---|---|---|
@@ -150,15 +151,27 @@ du noyau à la volée et le sert au navigateur sous `/core/`, ce qui évite d'en
 | Akropolis | 2 à 4 | 16 champs par joueur | Pierres, puis victoire partagée |
 | Moon Colony Bloodbath | 1 à 5 | 2 champs par joueur | aucun → victoire partagée |
 | Dune: Imperium | 1 à 4 | 1 champ par joueur | Épice, Solaris, Eau, Troupes |
+| Ark Nova | 1 à 4 | 2 champs par joueur | projets de conservation, puis victoire partagée |
 
 Règles vérifiées contre les livrets officiels, sauf Flip 7 dont seule une
 synthèse de deux pages est disponible.
+
+Ark Nova ne demande que deux nombres : l'attrait, et la **valeur écrite en
+blanc** sur la case du marqueur de conservation. C'est exactement ce que le
+livret demande de faire, et c'est tout le décompte. L'exemple du livret est
+une partie de référence : 24+80 = 104 contre 30+78 = 108, et le joueur qui a
+deux points d'attrait de moins l'emporte.
+
+Une réserve y est déclarée plutôt que comblée : la table complète de la piste
+de conservation n'est pas lisible dans le livret, qui n'en montre que deux
+points. L'application demande donc la valeur lue sur le plateau au lieu de la
+position du marqueur, et la question reste affichée dans la partie.
 
 ## Ce qu'il y a dans le dépôt
 
 ```
 packages/rules-core/   le noyau — aucune règle de jeu, aucune E/S
-games/*.json           les quatre jeux, en DONNÉES chargées à l'exécution
+games/*.json           les cinq jeux, en DONNÉES chargées à l'exécution
 i18n/*.json            les libellés, également en données
 fixtures/*.json        les parties de référence, avec leurs résultats attendus
 server/                l'API — routeur maison sur node:http, base node:sqlite
