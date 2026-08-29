@@ -47,12 +47,12 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 354 contrôles, aucune dépendance :
+Cinq portes, 365 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
 | `npm run validate` | la porte de publication refuse un bundle non conforme |
-| `npm run play` | les seize parties de référence, jouées par le noyau |
+| `npm run play` | les dix-sept parties de référence, jouées par le noyau |
 | `npm run e2e` | les mêmes parties, rejouées **à travers l'API HTTP** |
 | `npm run p0` | l'arithmétique exacte et le classement |
 | `npm run p0b` | le langage de formules et son explication |
@@ -151,35 +151,33 @@ du noyau à la volée et le sert au navigateur sous `/core/`, ce qui évite d'en
 | Akropolis | 2 à 4 | 16 champs par joueur | Pierres, puis victoire partagée |
 | Moon Colony Bloodbath | 1 à 5 | 2 champs par joueur | aucun → victoire partagée |
 | Dune: Imperium | 1 à 4 | 1 champ par joueur | Épice, Solaris, Eau, Troupes |
-| Ark Nova | 1 à 4 | 2 champs par joueur, 1 facultatif | projets de conservation, puis victoire partagée |
+| Ark Nova | 1 à 4 | 2 champs par joueur | projets de conservation, puis victoire partagée |
 
 Règles vérifiées contre les livrets officiels, sauf Flip 7 dont seule une
 synthèse de deux pages est disponible.
 
 **Les cinq jeux ont une fiche de mise en place.**
 
-Ark Nova ne demande que deux nombres : l'attrait, et la **valeur écrite en
-blanc** sur la case du marqueur de conservation. C'est exactement ce que le
-livret demande de faire, et c'est tout le décompte. L'exemple du livret est
-une partie de référence : 24+80 = 104 contre 30+78 = 108, et le joueur qui a
-deux points d'attrait de moins l'emporte.
+Ark Nova ne demande que deux nombres par joueur : l'attrait et les points de
+conservation. **Ses deux éditions sont traitées.** Le livret de 2023 fait
+additionner une valeur imprimée en blanc sur la piste ; l'édition précédente
+fait soustraire la plus faible valeur d'attrait de la zone de conservation, ce
+qui autorise les scores négatifs. Un interrupteur de table choisit laquelle.
 
-Une réserve y est déclarée plutôt que comblée : la table des **valeurs** de la
-piste de conservation n'est pas dans le livret, qui n'en montre que deux
-points. L'application demande donc la valeur lue sur le plateau au lieu de la
-position du marqueur, et la question reste affichée dans la partie.
+Les deux formules tombent du même relevé de plateau : l'attrait monte de 0 à
+113, la conservation descend de 113 vers 1 en 10 paires puis 31 triplets. La
+plus faible valeur d'attrait de la zone est la « valeur de référence » de
+l'édition ancienne, et **la valeur en blanc de l'édition 2023 vaut exactement
+100 moins cette référence** — les deux livrets le confirment sur les mêmes
+cases : conservation 16 → référence 76 et valeur 24, conservation 18 →
+référence 70 et valeur 30. Les classements sont donc identiques, à 100 points
+par joueur près.
 
-L'**alignement des deux pistes**, lui, est relevé sur le plateau. Les marqueurs
-avancent l'un vers l'autre sur la même bande : l'attrait monte de 0 à 113, la
-conservation descend de 113 vers 1 — 10 paires jusqu'à l'attrait 94, puis
-31 triplets jusqu'à 1, soit 42 cases de conservation. Un champ facultatif, le
-nombre de points de conservation, permet à l'application de dire si les
-marqueurs sont dans la **même zone**, s'ils se sont **croisés**, ou s'ils ne se
-sont pas rejoints — auquel cas la partie n'aurait pas dû s'arrêter.
-
-Le livret sert de preuve : il écrit que 64 d'attrait et 20 de conservation sont
-dans la même zone. La reconstruction place la conservation 20 sur l'attrait
-66-64, et 64 y tombe exactement. Les bornes sont testées à l'unité près.
+Chaque édition a sa partie de référence, tirée de son propre livret :
+24+80 = 104 contre 30+78 = 108 pour l'une, 72−76 = −4 contre 79−70 = +9 pour
+l'autre. L'application dit aussi si les marqueurs sont dans la même zone, se
+sont croisés, ou ne se sont pas rejoints — auquel cas la partie n'aurait pas dû
+s'arrêter. Les bornes sont testées à l'unité près.
 
 ## Ce qu'il y a dans le dépôt
 

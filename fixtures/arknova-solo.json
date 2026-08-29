@@ -2,10 +2,38 @@
   "game": "ark-nova",
   "mode": "express",
   "label": "Solo — 102 points, au-dessus des 100 exigés",
-  "participants": [{ "id": "solo", "name": "Solo" }],
-  "rounds": [{
-    "solo": { "appeal": { "type": "INTEGER", "value": "78" }, "conservationValue": { "type": "INTEGER", "value": "24" } }
-  }],
-  "expect": { "totals": { "solo": 102 }, "ranks": { "solo": 1 }, "questions": 0 },
+  "participants": [
+    {
+      "id": "solo",
+      "name": "Solo"
+    }
+  ],
+  "rounds": [
+    {
+      "solo": {
+        "printedValues": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "appeal": {
+          "type": "INTEGER",
+          "value": "78"
+        },
+        "conservationPoints": {
+          "type": "INTEGER",
+          "value": "16"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "solo": 102
+    },
+    "ranks": {
+      "solo": 1
+    },
+    "questions": 0
+  },
   "note": "Le livret fixe la victoire solo à 100 points de victoire après le décompte final."
 }

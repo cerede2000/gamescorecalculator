@@ -360,35 +360,54 @@ section('Égalité à 200 : on joue une manche supplémentaire')
      N(st.totals.a) === 222 && N(st.totals.b) === 210)
 }
 // ── corriger et supprimer une manche ──────────────────────────────────────
-section('Ark Nova : la conservation devant l\'attrait')
+section('Ark Nova : deux éditions, un seul classement')
 {
-  const play = async (players: { id: string; appeal: number; conservation: number }[]) => {
+  const play = async (
+    printedValues: boolean,
+    players: { id: string; appeal: number; conservation: number }[]
+  ) => {
     let st = await call('POST', '/api/matches', {
       gameId: 'ark-nova', mode: 'express',
       players: players.map(p => ({ id: p.id, name: p.id }))
     })
     st = await call('PUT', `/api/matches/${st.match.id}/rounds/1`, {
       expectedVersion: st.match.version,
-      inputs: Object.fromEntries(players.map(p =>
-        [p.id, { values: { appeal: p.appeal, conservationValue: p.conservation } }]))
+      inputs: {
+        '@table': { values: { printedValues } },
+        ...Object.fromEntries(players.map(p =>
+          [p.id, { values: { appeal: p.appeal, conservationPoints: p.conservation } }]))
+      }
     })
     return st
   }
 
-  // l'exemple du livret : moins d'attrait, mais plus de conservation
-  let st = await play([{ id: 'bleu', appeal: 80, conservation: 24 }, { id: 'rouge', appeal: 78, conservation: 30 }])
-  ok('24+80 = 104 et 30+78 = 108', N(st.totals.bleu) === 104 && N(st.totals.rouge) === 108)
-  st = await call('POST', `/api/matches/${st.match.id}/finish`, { expectedVersion: st.match.version })
-  ok('Rouge gagne avec deux points d\'attrait de moins', st.ranking.standings[0].id === 'rouge')
+  // l'exemple du livret 2023 : la valeur en blanc est déduite de la piste
+  let st = await play(true, [{ id: 'bleu', appeal: 80, conservation: 16 }, { id: 'rouge', appeal: 78, conservation: 18 }])
+  ok('édition 2023 : 24+80 = 104 et 30+78 = 108',
+     N(st.totals.bleu) === 104 && N(st.totals.rouge) === 108,
+     JSON.stringify({ bleu: N(st.totals.bleu), rouge: N(st.totals.rouge) }))
+
+  // l'exemple du livret précédent, sur les MÊMES cases de conservation
+  st = await play(false, [{ id: 'bleu', appeal: 72, conservation: 16 }, { id: 'rouge', appeal: 79, conservation: 18 }])
+  ok('édition précédente : 72−76 = −4 et 79−70 = +9',
+     N(st.totals.bleu) === -4 && N(st.totals.rouge) === 9,
+     JSON.stringify({ bleu: N(st.totals.bleu), rouge: N(st.totals.rouge) }))
+  ok('un score négatif reste un score', N(st.totals.bleu) < 0)
+
+  // le même classement dans les deux éditions, à 100 points près
+  const a = await play(true, [{ id: 'x', appeal: 72, conservation: 16 }, { id: 'y', appeal: 79, conservation: 18 }])
+  ok('les deux éditions donnent le même écart entre joueurs',
+     N(a.totals.y) - N(a.totals.x) === 9 - (-4))
 
   // le départage ne dérange que les joueurs concernés
-  st = await play([
-    { id: 'ana', appeal: 72, conservation: 26 },
-    { id: 'bo', appeal: 80, conservation: 18 },
-    { id: 'cy', appeal: 60, conservation: 24 }
+  st = await play(true, [
+    { id: 'ana', appeal: 72, conservation: 20 },
+    { id: 'bo', appeal: 78, conservation: 18 },
+    { id: 'cy', appeal: 60, conservation: 20 }
   ])
+  ok('deux chemins différents vers 108', N(st.totals.ana) === 108 && N(st.totals.bo) === 108)
   st = await call('POST', `/api/matches/${st.match.id}/finish`, { expectedVersion: st.match.version })
-  ok('à 98 partout, la question porte sur les projets de conservation',
+  ok('la question porte sur les projets de conservation',
      st.question?.metric === 'conservationProjects')
   ok('et ne s\'adresse qu\'aux deux joueurs à égalité',
      JSON.stringify(st.question.ids.sort()) === '["ana","bo"]', JSON.stringify(st.question?.ids))
@@ -397,47 +416,27 @@ section('Ark Nova : la conservation devant l\'attrait')
   })
   ok('deux questions ont suffi', st.ranking.questionsAsked === 2 && st.ranking.standings[0].id === 'bo')
 
-  // les zones de décompte, relevées sur le plateau
-  const zone = async (appeal: number, conservation: number, caseConservation: number) => {
-    let z = await call('POST', '/api/matches', {
-      gameId: 'ark-nova', mode: 'express', players: [{ id: 'p', name: 'P' }]
-    })
-    z = await call('PUT', `/api/matches/${z.match.id}/rounds/1`, {
-      expectedVersion: z.match.version,
-      inputs: { p: { values: { appeal, conservationValue: conservation, conservationCase: caseConservation } } }
-    })
-    return z.gameNotices.map((n: any) => n.code)
-  }
-  ok('Bleu et Rouge ont croisé leurs marqueurs',
-     (await zone(80, 24, 16)).includes('endCrossed') &&
-     (await zone(78, 30, 18)).includes('endCrossed'))
-  // le livret dit « les deux marqueurs sont dans la MÊME zone de décompte » :
-  // la conservation 20 occupe l'attrait 66-64, et 64 y tombe exactement
+  // les zones de décompte, prouvées par les deux livrets
+  const codes = async (appeal: number, conservation: number) =>
+    (await play(true, [{ id: 'p', appeal, conservation }])).gameNotices.map((n: any) => n.code)
   ok('l\'exemple de fin de partie du livret tombe pile sur la même zone',
-     (await zone(64, 28, 20)).includes('endSameZone'))
-  ok('les bornes de la zone sont exactes : 65 dedans, 67 croisé, 63 pas rejoint',
-     (await zone(65, 28, 20)).includes('endSameZone') &&
-     (await zone(67, 28, 20)).includes('endCrossed') &&
-     (await zone(63, 28, 20)).includes('endNotReached'))
-  ok('une combinaison impossible est signalée',
-     (await zone(20, 40, 30)).includes('endNotReached'))
-  ok('la dernière case de la piste occupe l\'attrait 3 à 1',
-     (await zone(1, 50, 41)).includes('endSameZone') &&
-     (await zone(3, 50, 41)).includes('endSameZone') &&
-     (await zone(4, 50, 41)).includes('endCrossed'))
-  const sansCase = await play([{ id: 'solo', appeal: 80, conservation: 24 }])
-  ok('le champ reste facultatif : rien n\'est dit sans lui',
-     !sansCase.gameNotices.some((n: any) => n.code.startsWith('end')))
+     (await codes(64, 20)).includes('endSameZone'))
+  ok('bornes exactes : 65 dedans, 67 croisé, 63 pas rejoint',
+     (await codes(65, 20)).includes('endSameZone') &&
+     (await codes(67, 20)).includes('endCrossed') &&
+     (await codes(63, 20)).includes('endNotReached'))
+  ok('la dernière case occupe l\'attrait 3 à 1',
+     (await codes(3, 41)).includes('endSameZone') && (await codes(4, 41)).includes('endCrossed'))
 
   // le seuil solo
-  const gagne = await play([{ id: 'solo', appeal: 78, conservation: 24 }])
+  const gagne = await play(true, [{ id: 'solo', appeal: 78, conservation: 16 }])
   ok('solo à 102 : la victoire est annoncée',
-     gagne.gameNotices.some((n: any) => n.code === 'soloWin'), JSON.stringify(gagne.gameNotices))
-  const perdu = await play([{ id: 'solo', appeal: 60, conservation: 20 }])
-  ok('solo à 80 : la défaite est annoncée',
+     N(gagne.totals.solo) === 102 && gagne.gameNotices.some((n: any) => n.code === 'soloWin'))
+  const perdu = await play(true, [{ id: 'solo', appeal: 40, conservation: 10 }])
+  ok('solo en dessous de 100 : la défaite est annoncée',
      perdu.gameNotices.some((n: any) => n.code === 'soloLoss'))
-  const duo = await play([{ id: 'a', appeal: 60, conservation: 20 }, { id: 'b', appeal: 50, conservation: 10 }])
-  ok('à deux, aucun avis solo', duo.gameNotices.length === 0, JSON.stringify(duo.gameNotices))
+  const duo = await play(true, [{ id: 'a', appeal: 60, conservation: 20 }, { id: 'b', appeal: 50, conservation: 10 }])
+  ok('à deux, aucun avis solo', !duo.gameNotices.some((n: any) => n.code.startsWith('solo')))
 }
 
 section('Mise en place : les quantités suivent la table')

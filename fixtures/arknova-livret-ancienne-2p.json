@@ -1,7 +1,7 @@
 {
   "game": "ark-nova",
   "mode": "express",
-  "label": "Exemple du livret 2023 — 24+80=104 contre 30+78=108",
+  "label": "Exemple du livret précédent — 72−76=−4 contre 79−70=+9",
   "participants": [
     {
       "id": "bleu",
@@ -17,11 +17,11 @@
       "bleu": {
         "printedValues": {
           "type": "BOOLEAN",
-          "value": "true"
+          "value": "false"
         },
         "appeal": {
           "type": "INTEGER",
-          "value": "80"
+          "value": "72"
         },
         "conservationPoints": {
           "type": "INTEGER",
@@ -31,11 +31,11 @@
       "rouge": {
         "printedValues": {
           "type": "BOOLEAN",
-          "value": "true"
+          "value": "false"
         },
         "appeal": {
           "type": "INTEGER",
-          "value": "78"
+          "value": "79"
         },
         "conservationPoints": {
           "type": "INTEGER",
@@ -46,8 +46,8 @@
   ],
   "expect": {
     "totals": {
-      "bleu": 104,
-      "rouge": 108
+      "bleu": -4,
+      "rouge": 9
     },
     "ranks": {
       "rouge": 1,
@@ -55,5 +55,5 @@
     },
     "questions": 0
   },
-  "note": "Le livret dit : Bleu case 16 (valeur 24) avec 80 d'attrait, Rouge case 18 (valeur 30) avec 78. L'application déduit 24 et 30 de la piste : 100 moins la référence de la zone (76 et 70)."
+  "note": "L'édition sans valeurs en blanc soustrait la plus faible valeur d'attrait de la zone : 76 pour la conservation 16, 70 pour la 18. Un score peut être négatif. Le classement est le même que dans l'édition suivante, à 100 points près."
 }

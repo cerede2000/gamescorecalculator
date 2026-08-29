@@ -1,20 +1,85 @@
 {
   "game": "ark-nova",
   "mode": "express",
-  "label": "Deux joueurs à 98 — départage aux projets de conservation",
+  "label": "Deux joueurs à 108 — départage aux projets de conservation",
   "participants": [
-    { "id": "ana", "name": "Ana" }, { "id": "bo", "name": "Bo" }, { "id": "cy", "name": "Cy" }
+    {
+      "id": "ana",
+      "name": "Ana"
+    },
+    {
+      "id": "bo",
+      "name": "Bo"
+    },
+    {
+      "id": "cy",
+      "name": "Cy"
+    }
   ],
-  "rounds": [{
-    "ana": { "appeal": { "type": "INTEGER", "value": "72" }, "conservationValue": { "type": "INTEGER", "value": "26" } },
-    "bo":  { "appeal": { "type": "INTEGER", "value": "80" }, "conservationValue": { "type": "INTEGER", "value": "18" } },
-    "cy":  { "appeal": { "type": "INTEGER", "value": "60" }, "conservationValue": { "type": "INTEGER", "value": "24" } }
-  }],
-  "tiebreak": { "conservationProjects": { "ana": 5, "bo": 7 } },
+  "rounds": [
+    {
+      "ana": {
+        "printedValues": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "appeal": {
+          "type": "INTEGER",
+          "value": "72"
+        },
+        "conservationPoints": {
+          "type": "INTEGER",
+          "value": "20"
+        }
+      },
+      "bo": {
+        "printedValues": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "appeal": {
+          "type": "INTEGER",
+          "value": "78"
+        },
+        "conservationPoints": {
+          "type": "INTEGER",
+          "value": "18"
+        }
+      },
+      "cy": {
+        "printedValues": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "appeal": {
+          "type": "INTEGER",
+          "value": "60"
+        },
+        "conservationPoints": {
+          "type": "INTEGER",
+          "value": "20"
+        }
+      }
+    }
+  ],
+  "tiebreak": {
+    "conservationProjects": {
+      "ana": 5,
+      "bo": 7
+    }
+  },
   "expect": {
-    "totals": { "ana": 98, "bo": 98, "cy": 84 },
-    "ranks": { "bo": 1, "ana": 2, "cy": 3 },
+    "totals": {
+      "ana": 108,
+      "bo": 108,
+      "cy": 96
+    },
+    "ranks": {
+      "bo": 1,
+      "ana": 2,
+      "cy": 3
+    },
     "questions": 2
   },
-  "note": "Deux chemins différents vers 98 points. La question n'est posée qu'aux deux joueurs encore à égalité, pas à Cy."
+  "note": "Deux chemins vers 108 : Ana mise sur la conservation (référence 64), Bo sur l'attrait (référence 70). La question n'est posée qu'à eux deux."
 }

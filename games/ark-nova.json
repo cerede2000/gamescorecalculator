@@ -20,16 +20,14 @@
   "policies": [
     {
       "id": "conservationTrackTable",
-      "status": "unconfirmed",
-      "question": "Quelle est la table complète de la piste de conservation, case par case, jusqu'à sa valeur en blanc ? Le livret n'en montre que deux points : la case 16 vaut 24, la case 18 vaut 30.",
+      "status": "confirmed",
       "options": [
-        "readFromBoard",
-        "fullTable"
+        "derivedFromZones"
       ],
-      "provisional": "readFromBoard",
+      "provisional": "derivedFromZones",
       "affectsScore": false,
-      "source": null,
-      "rationale": "Faute de table des valeurs, l'application demande la valeur en blanc plutôt que la position du marqueur. L'alignement des zones, lui, est relevé sur le plateau et sert à vérifier la fin de partie."
+      "source": "alignement des deux pistes relevé sur le plateau, vérifié par les exemples des deux livrets : conservation 16 → référence 76, conservation 18 → référence 70",
+      "rationale": "La valeur en blanc vaut 100 moins la plus faible valeur d'attrait de la zone. Les deux livrets le confirment : conservation 16 → référence 76 et valeur 24 ; conservation 18 → référence 70 et valeur 30."
     },
     {
       "id": "finalTiebreak",
@@ -43,14 +41,7 @@
       "rationale": "Départage aux projets de conservation soutenus, puis victoire partagée."
     }
   ],
-  "scopeNotes": [
-    {
-      "id": "endTrigger",
-      "kind": "productScope",
-      "text": "La fin de partie se déclenche quand vos marqueurs de conservation et d'attrait se rejoignent ou se croisent. L'application ne suit pas la partie et ne peut donc pas vous prévenir sur le moment ; en revanche, si vous saisissez le numéro de votre case de conservation, elle vérifie après coup que la fin était bien déclenchée.",
-      "source": "livret p.19, et alignement des zones relevé sur le plateau"
-    }
-  ],
+  "scopeNotes": [],
   "setupAssistant": {
     "enabled": true,
     "steps": [
@@ -331,7 +322,7 @@
   },
   "ui": {
     "layout": "playerGrid",
-    "fieldsPerPlayer": 3
+    "fieldsPerPlayer": 2
   },
   "scoringEngine": {
     "modes": [
@@ -340,10 +331,24 @@
         "default": true,
         "inputs": [
           {
+            "id": "printedValues",
+            "label": "i18n:an.printedValues",
+            "type": "BOOLEAN",
+            "scope": "GAME",
+            "control": "toggle",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "true"
+            },
+            "usedBy": "formula:final.conservation",
+            "help": "i18n:an.printedValues.help"
+          },
+          {
             "id": "appeal",
             "label": "i18n:an.appeal",
             "type": "INTEGER",
             "min": 0,
+            "max": 113,
             "scope": "PARTICIPANT",
             "control": "stepper",
             "required": true,
@@ -351,26 +356,324 @@
             "help": "i18n:an.appeal.help"
           },
           {
-            "id": "conservationValue",
-            "label": "i18n:an.conservationValue",
-            "type": "INTEGER",
-            "min": 0,
-            "scope": "PARTICIPANT",
-            "control": "stepper",
-            "required": true,
-            "usedBy": "formula:final.conservation",
-            "help": "i18n:an.conservationValue.help"
-          },
-          {
-            "id": "conservationCase",
-            "label": "i18n:an.conservationCase",
+            "id": "conservationPoints",
+            "label": "i18n:an.conservationPoints",
             "type": "INTEGER",
             "min": 0,
             "max": 41,
             "scope": "PARTICIPANT",
             "control": "stepper",
-            "usedBy": "notice:endSameZone",
-            "help": "i18n:an.conservationCase.help"
+            "required": true,
+            "usedBy": "formula:final.conservation",
+            "help": "i18n:an.conservationPoints.help"
+          }
+        ],
+        "derive": [
+          {
+            "id": "reference",
+            "value": {
+              "op": "bracket",
+              "input": {
+                "op": "ref",
+                "id": "conservationPoints"
+              },
+              "table": [
+                {
+                  "upTo": 0,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "114"
+                  }
+                },
+                {
+                  "upTo": 1,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "112"
+                  }
+                },
+                {
+                  "upTo": 2,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "110"
+                  }
+                },
+                {
+                  "upTo": 3,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "108"
+                  }
+                },
+                {
+                  "upTo": 4,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "106"
+                  }
+                },
+                {
+                  "upTo": 5,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "104"
+                  }
+                },
+                {
+                  "upTo": 6,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "102"
+                  }
+                },
+                {
+                  "upTo": 7,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "100"
+                  }
+                },
+                {
+                  "upTo": 8,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "98"
+                  }
+                },
+                {
+                  "upTo": 9,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "96"
+                  }
+                },
+                {
+                  "upTo": 10,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "94"
+                  }
+                },
+                {
+                  "upTo": 11,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "91"
+                  }
+                },
+                {
+                  "upTo": 12,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "88"
+                  }
+                },
+                {
+                  "upTo": 13,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "85"
+                  }
+                },
+                {
+                  "upTo": 14,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "82"
+                  }
+                },
+                {
+                  "upTo": 15,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "79"
+                  }
+                },
+                {
+                  "upTo": 16,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "76"
+                  }
+                },
+                {
+                  "upTo": 17,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "73"
+                  }
+                },
+                {
+                  "upTo": 18,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "70"
+                  }
+                },
+                {
+                  "upTo": 19,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "67"
+                  }
+                },
+                {
+                  "upTo": 20,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "64"
+                  }
+                },
+                {
+                  "upTo": 21,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "61"
+                  }
+                },
+                {
+                  "upTo": 22,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "58"
+                  }
+                },
+                {
+                  "upTo": 23,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "55"
+                  }
+                },
+                {
+                  "upTo": 24,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "52"
+                  }
+                },
+                {
+                  "upTo": 25,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "49"
+                  }
+                },
+                {
+                  "upTo": 26,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "46"
+                  }
+                },
+                {
+                  "upTo": 27,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "43"
+                  }
+                },
+                {
+                  "upTo": 28,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "40"
+                  }
+                },
+                {
+                  "upTo": 29,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "37"
+                  }
+                },
+                {
+                  "upTo": 30,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "34"
+                  }
+                },
+                {
+                  "upTo": 31,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "31"
+                  }
+                },
+                {
+                  "upTo": 32,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "28"
+                  }
+                },
+                {
+                  "upTo": 33,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "25"
+                  }
+                },
+                {
+                  "upTo": 34,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "22"
+                  }
+                },
+                {
+                  "upTo": 35,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "19"
+                  }
+                },
+                {
+                  "upTo": 36,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "16"
+                  }
+                },
+                {
+                  "upTo": 37,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "13"
+                  }
+                },
+                {
+                  "upTo": 38,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "10"
+                  }
+                },
+                {
+                  "upTo": 39,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "7"
+                  }
+                },
+                {
+                  "upTo": 40,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "4"
+                  }
+                },
+                {
+                  "upTo": 41,
+                  "value": {
+                    "type": "INTEGER",
+                    "value": "1"
+                  }
+                }
+              ]
+            }
           }
         ]
       }
@@ -387,9 +690,52 @@
       {
         "code": "final.conservation",
         "label": "i18n:an.line.conservation",
-        "value": {
+        "when": {
           "op": "ref",
-          "id": "conservationValue"
+          "id": "printedValues"
+        },
+        "value": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "lit",
+              "value": {
+                "type": "INTEGER",
+                "value": "100"
+              }
+            },
+            {
+              "op": "ref",
+              "id": "reference"
+            }
+          ]
+        }
+      },
+      {
+        "code": "final.reference",
+        "label": "i18n:an.line.reference",
+        "when": {
+          "op": "not",
+          "arg": {
+            "op": "ref",
+            "id": "printedValues"
+          }
+        },
+        "value": {
+          "op": "sub",
+          "args": [
+            {
+              "op": "lit",
+              "value": {
+                "type": "INTEGER",
+                "value": "0"
+              }
+            },
+            {
+              "op": "ref",
+              "id": "reference"
+            }
+          ]
         }
       }
     ],
@@ -476,7 +822,7 @@
         "code": "endSameZone",
         "label": "i18n:an.notice.endSameZone",
         "level": "info",
-        "source": "livret p.19, et alignement des deux pistes relevé sur le plateau : 10 paires de l'attrait 113 à 94, puis 31 triplets de 93 à 1",
+        "source": "alignement des deux pistes relevé sur le plateau, vérifié par les exemples des deux livrets : conservation 16 → référence 76, conservation 18 → référence 70",
         "when": {
           "op": "and",
           "args": [
@@ -490,7 +836,7 @@
                 "op": "bracket",
                 "input": {
                   "op": "ref",
-                  "id": "conservationCase"
+                  "id": "conservationPoints"
                 },
                 "table": [
                   {
@@ -800,7 +1146,7 @@
                 "op": "bracket",
                 "input": {
                   "op": "ref",
-                  "id": "conservationCase"
+                  "id": "conservationPoints"
                 },
                 "table": [
                   {
@@ -1107,7 +1453,7 @@
         "code": "endCrossed",
         "label": "i18n:an.notice.endCrossed",
         "level": "info",
-        "source": "livret p.19, et alignement des deux pistes relevé sur le plateau : 10 paires de l'attrait 113 à 94, puis 31 triplets de 93 à 1",
+        "source": "alignement des deux pistes relevé sur le plateau, vérifié par les exemples des deux livrets : conservation 16 → référence 76, conservation 18 → référence 70",
         "when": {
           "op": "gt",
           "left": {
@@ -1118,7 +1464,7 @@
             "op": "bracket",
             "input": {
               "op": "ref",
-              "id": "conservationCase"
+              "id": "conservationPoints"
             },
             "table": [
               {
@@ -1423,7 +1769,7 @@
         "code": "endNotReached",
         "label": "i18n:an.notice.endNotReached",
         "level": "warn",
-        "source": "livret p.19, et alignement des deux pistes relevé sur le plateau : 10 paires de l'attrait 113 à 94, puis 31 triplets de 93 à 1",
+        "source": "alignement des deux pistes relevé sur le plateau, vérifié par les exemples des deux livrets : conservation 16 → référence 76, conservation 18 → référence 70",
         "when": {
           "op": "lt",
           "left": {
@@ -1434,7 +1780,7 @@
             "op": "bracket",
             "input": {
               "op": "ref",
-              "id": "conservationCase"
+              "id": "conservationPoints"
             },
             "table": [
               {
@@ -1759,6 +2105,7 @@
   },
   "fixtures": [
     "arknova-livret-2p",
+    "arknova-livret-ancienne-2p",
     "arknova-tiebreak-3p",
     "arknova-solo"
   ]
