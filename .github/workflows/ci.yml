@@ -88,6 +88,12 @@ jobs:
             sleep 1
           done
           cat /tmp/h.json
-          test "$(node -e "console.log(require('/tmp/h.json').games)")" = "4"
+          # le nombre attendu se DÉDUIT du dépôt : un chiffre en dur ici
+          # échoue au premier jeu ajouté, sans rien dire de l'image
+          attendu=$(ls games/*.json | wc -l | tr -d ' ')
+          obtenu=$(node -e "console.log(require('/tmp/h.json').games)")
+          echo "catalogue servi : $obtenu jeu(x), attendu $attendu"
+          test "$obtenu" = "$attendu"
+          test "$(node -e "console.log(require('/tmp/h.json').refused.length)")" = "0"
           curl -fsS localhost:8080/ | grep -q "Tablée"
           docker logs tablee
