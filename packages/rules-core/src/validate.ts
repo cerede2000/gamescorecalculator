@@ -94,6 +94,22 @@ export function validate(b: Bundle): Issue[] {
     if (!f.usedBy) { err('EC-03', `champ « ${f.id} » sans usedBy — refusé`); continue }
     if (!targets.has(f.usedBy))
       err('EC-03', `champ « ${f.id} » : usedBy « ${f.usedBy} » ne désigne rien d'existant`)
+
+    // ── RG-12 · une valeur par défaut est une exception DÉCLARÉE ───────────
+    const d = f.whenAbsent
+    if (d === undefined) continue
+    if (f.required)
+      err('RG-12', `champ « ${f.id} » à la fois requis et pourvu d'une valeur par défaut : l'un des deux ment`)
+    if (d.type !== f.type)
+      err('RG-12', `champ « ${f.id} » : valeur par défaut ${d.type} pour un champ ${f.type}`)
+    else if (d.type === 'INTEGER') {
+      const n = Number(d.value)
+      if (!Number.isInteger(n)) err('RG-12', `champ « ${f.id} » : valeur par défaut non entière`)
+      if (f.min !== undefined && n < f.min) err('RG-12', `champ « ${f.id} » : valeur par défaut sous le minimum`)
+      if (f.max !== undefined && n > f.max) err('RG-12', `champ « ${f.id} » : valeur par défaut au-dessus du maximum`)
+      if (f.values && !f.values.includes(n)) err('RG-12', `champ « ${f.id} » : valeur par défaut hors de l'ensemble déclaré`)
+    } else if (d.type === 'BOOLEAN' && d.value !== 'true' && d.value !== 'false')
+      err('RG-12', `champ « ${f.id} » : valeur par défaut booléenne hors domaine`)
   }
 
   // ── références mortes et opérateurs hors langage ──────────────────────────

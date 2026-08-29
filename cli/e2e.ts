@@ -140,28 +140,56 @@ await refuse('une version périmée', () => call('PUT', `/api/matches/${one.matc
 await refuse('un critère de départage qui n\'existe pas', () => call('POST', `/api/matches/${one.match.id}/tiebreak`,
   { metric: 'chance', values: {} }))
 
-// ── absent n'est pas zéro, jusque dans la réponse ─────────────────────────
+// ── absent n'est pas zéro, sauf là où le jeu le déclare ───────────────────
 console.log()
 console.log(b('Absent n\'est pas zéro'))
-let inc = await call('POST', '/api/matches', {
-  gameId: 'akropolis', mode: 'express',
-  players: [{ id: 'x', name: 'X' }, { id: 'y', name: 'Y' }]
-})
-inc = await call('PUT', `/api/matches/${inc.match.id}/rounds/1`, {
-  expectedVersion: inc.match.version,
-  inputs: {
-    // la variante se choisit pour la table, pas par joueur
-    '@table': { values: { varHousing: false } },
-    x: { values: { housingValue: 9, housingStars: 3 } },   // le reste non saisi
-    y: { values: { housingValue: 4, housingStars: 1, marketStd: 0, marketDbl: 0, marketStars: 0, barracksStd: 0, barracksDbl: 0, barracksStars: 0, templeStd: 0, templeDbl: 0, templeStars: 0, gardenStd: 0, gardenDbl: 0, gardenStars: 0, stones: 0 } }
-  }
-})
-ok('un total incomplet vaut INCONNU, pas un nombre', inc.totals.x === null, `obtenu ${JSON.stringify(inc.totals.x)}`)
-ok('un total complet vaut son nombre', N(inc.totals.y) === 4)
-inc = await call('POST', `/api/matches/${inc.match.id}/finish`, { expectedVersion: inc.match.version })
-ok('classement refusé, pas une panne : le serveur répond et nomme qui manque',
-   inc.ranking === null && inc.blocked?.ids.includes('x') && !inc.blocked.ids.includes('y'),
-   JSON.stringify(inc.blocked))
+{
+  // Dune ne déclare aucune valeur par défaut : l'absence y reste l'inconnu
+  let inc = await call('POST', '/api/matches', {
+    gameId: 'dune-imperium', mode: 'express',
+    players: [{ id: 'x', name: 'X' }, { id: 'y', name: 'Y' }, { id: 'z', name: 'Z' }]
+  })
+  inc = await call('PUT', `/api/matches/${inc.match.id}/rounds/1`, {
+    expectedVersion: inc.match.version,
+    inputs: { y: { values: { finalVictoryPoints: 8 } }, z: { values: { finalVictoryPoints: 5 } } }
+  })
+  ok('un score jamais saisi vaut INCONNU, pas zéro', inc.totals.x === null, JSON.stringify(inc.totals.x))
+  ok('un score saisi vaut son nombre', N(inc.totals.y) === 8)
+  inc = await call('POST', `/api/matches/${inc.match.id}/finish`, { expectedVersion: inc.match.version })
+  ok('classement refusé, pas une panne : le serveur répond et nomme qui manque',
+     inc.ranking === null && inc.blocked?.ids.includes('x') && !inc.blocked.ids.includes('y'),
+     JSON.stringify(inc.blocked))
+
+  // Akropolis déclare l'inverse : une catégorie vide est un fait, pas une lacune
+  let ak = await call('POST', '/api/matches', {
+    gameId: 'akropolis', mode: 'express',
+    players: [{ id: 'a', name: 'Ada' }, { id: 'b', name: 'Bruno' }]
+  })
+  ak = await call('PUT', `/api/matches/${ak.match.id}/rounds/1`, {
+    expectedVersion: ak.match.version,
+    inputs: {
+      a: { values: { housingValue: 5, housingStars: 4, marketStd: 1, marketStars: 1, stones: 2 } },
+      b: { values: { stones: 4 } }
+    }
+  })
+  ok('cinq cases suffisent : 5×4 + 1 + 2 Pierres = 23', N(ak.totals.a) === 23, JSON.stringify(ak.totals.a))
+  ok('un joueur qui n\'a que ses Pierres marque 4', N(ak.totals.b) === 4, JSON.stringify(ak.totals.b))
+  ak = await call('POST', `/api/matches/${ak.match.id}/finish`, { expectedVersion: ak.match.version })
+  ok('et la table se classe au lieu de se bloquer',
+     ak.blocked === null && ak.ranking.standings[0].id === 'a')
+
+  // ce que la porte de publication refuse : les deux à la fois
+  const { validate } = await import('../packages/rules-core/src/validate.ts')
+  const bad = JSON.parse(readFileSync('games/dune-imperium.json', 'utf8'))
+  bad.scoringEngine.modes[0].inputs[0].required = true
+  bad.scoringEngine.modes[0].inputs[0].whenAbsent = { type: 'INTEGER', value: '0' }
+  ok('un champ requis ET pourvu d\'un défaut est refusé',
+     validate(bad).some((i: any) => i.rule === 'RG-12' && i.severity === 'error'))
+  const bad2 = JSON.parse(readFileSync('games/akropolis.json', 'utf8'))
+  bad2.scoringEngine.modes[0].inputs[0].whenAbsent = { type: 'BOOLEAN', value: 'true' }
+  ok('un défaut du mauvais domaine est refusé',
+     validate(bad2).some((i: any) => i.rule === 'RG-12' && i.severity === 'error'))
+}
 
 // ── ce que le matériel interdit ───────────────────────────────────────────
 console.log()
@@ -324,7 +352,6 @@ console.log(b('Égalité à 200 : on joue une manche supplémentaire'))
   ok('Ana l\'emporte 222 à 210',
      N(st.totals.a) === 222 && N(st.totals.b) === 210)
 }
-
 // ── corriger et supprimer une manche ──────────────────────────────────────
 console.log()
 console.log(b('Revenir sur une manche'))

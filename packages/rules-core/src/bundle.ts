@@ -2,6 +2,7 @@
 // fichier JSON à l'exécution, jamais compilé avec le cœur (EF-022, EC-01).
 
 import type { Node } from './formula.ts'
+import type { NumericValue } from './numeric.ts'
 import type { Contribution, Derivation } from './score.ts'
 import type { RankSpec } from './rank.ts'
 
@@ -21,6 +22,17 @@ export type Field = {
    *  Un champ sans justification est refusé à la publication. */
   usedBy: string
   help?: string
+  /** Ce que vaut le champ quand rien n'est saisi.
+   *
+   *  Par défaut, absent veut dire INCONNU (RG-12) et l'inconnu se propage.
+   *  Certains jeux veulent l'inverse : dans un décompte par catégories, ne
+   *  rien avoir dans une catégorie est un fait ordinaire, pas une lacune —
+   *  et sans cette déclaration une seule case vide rendrait tout le total
+   *  inconnu, puisque les catégories se multiplient par leurs étoiles.
+   *
+   *  C'est un choix du JEU, jamais du cœur : il se déclare champ par champ,
+   *  et il est incompatible avec `required`. */
+  whenAbsent?: NumericValue
 }
 
 export type Policy = {

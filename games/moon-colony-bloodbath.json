@@ -56,7 +56,11 @@
             "type": "BOOLEAN",
             "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:survivors"
+            "usedBy": "formula:survivors",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "extendedSolo",
@@ -64,7 +68,11 @@
             "type": "BOOLEAN",
             "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:solo.robots"
+            "usedBy": "formula:solo.robots",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "moonBaseHabitants",
@@ -94,7 +102,11 @@
             "type": "BOOLEAN",
             "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:solo.event"
+            "usedBy": "formula:solo.event",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "eventNumber",
@@ -129,7 +141,11 @@
             "type": "BOOLEAN",
             "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:survivors"
+            "usedBy": "formula:survivors",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "extendedSolo",
@@ -137,7 +153,11 @@
             "type": "BOOLEAN",
             "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:solo.robots"
+            "usedBy": "formula:solo.robots",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "moonBaseHabitants",
@@ -155,7 +175,11 @@
             "type": "BOOLEAN",
             "scope": "GAME",
             "control": "toggle",
-            "usedBy": "formula:solo.event"
+            "usedBy": "formula:solo.event",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "eventNumber",

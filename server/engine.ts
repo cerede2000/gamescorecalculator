@@ -49,10 +49,10 @@ export function modeOf(b: Bundle, id: string): ScoringMode {
   return m
 }
 
-/** Tous les identifiants qu'une formule du mode peut référencer, pour les
- *  initialiser à INCONNU. Une référence absente doit valoir null, pas lever. */
-function declaredIds(mode: ScoringMode): string[] {
-  return mode.inputs.map(f => f.id)
+/** L'état d'un participant avant toute saisie : INCONNU partout, sauf là où
+ *  le jeu a déclaré ce que vaut l'absence. */
+function blankValues(mode: ScoringMode): Record<string, Maybe> {
+  return Object.fromEntries(mode.inputs.map(f => [f.id, f.whenAbsent ?? null]))
 }
 
 export function compute(
@@ -66,7 +66,6 @@ export function compute(
 ): Computed {
   const mode = modeOf(bundle, modeId)
   const spec = { derive: mode.derive ?? [], contributions: bundle.scoringEngine.contributions }
-  const ids = declaredIds(mode)
   const colIds = (mode.collections ?? []).map(c => c.id)
 
   const roundNos = [...new Set(inputs.map(r => r.round))].sort((a, b) => a - b)
@@ -80,12 +79,14 @@ export function compute(
   for (const n of roundNos) {
     const byParticipant: Record<string, Report> = {}
     for (const p of participants) {
-      const values: Record<string, Maybe> = Object.fromEntries(ids.map(k => [k, null]))
+      const values: Record<string, Maybe> = blankValues(mode)
       // les champs de portée table s'appliquent à tout le monde, puis le
-      // participant les recouvre s'il en porte de son côté
+      // participant les recouvre s'il en porte de son côté ; une case vidée
+      // retombe sur ce que le jeu a déclaré, pas sur l'inconnu
+      const fallback = new Map(mode.inputs.map(f => [f.id, f.whenAbsent ?? null]))
       for (const r of inputs)
         if (r.round === n && (r.participant_id === TABLE_SCOPE || r.participant_id === p.id))
-          values[r.field_id] = r.value === null ? null : parse(r.value)
+          values[r.field_id] = r.value === null ? (fallback.get(r.field_id) ?? null) : parse(r.value)
 
       const cols: Record<string, { k: number; v: number }[]> = Object.fromEntries(colIds.map(k => [k, []]))
       for (const c of collections)
@@ -113,6 +114,7 @@ export function compute(
   for (const p of participants) {
     const rep = last[p.id]
     const m: Record<string, Maybe> = {
+      ...blankValues(mode),
       cumulative: totals[p.id] ?? null,
       roundScore: rep?.total ?? null,
       roundIndex: I(roundNos[roundNos.length - 1]),
@@ -122,7 +124,7 @@ export function compute(
     }
     for (const r of inputs)
       if (r.round === roundNos[roundNos.length - 1] && (r.participant_id === TABLE_SCOPE || r.participant_id === p.id))
-        m[r.field_id] = r.value === null ? null : parse(r.value)
+        m[r.field_id] = r.value === null ? (mode.inputs.find(f => f.id === r.field_id)?.whenAbsent ?? null) : parse(r.value)
     for (const [k, v] of Object.entries(rep?.derived ?? {})) m[k] = v
     for (const l of rep?.lines ?? []) m[l.code] = l.value
     metrics[p.id] = m

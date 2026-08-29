@@ -84,9 +84,12 @@
             "type": "BOOLEAN",
             "scope": "PARTICIPANT_ROUND",
             "control": "toggle",
-            "required": true,
             "usedBy": "formula:round.busted",
-            "help": "i18n:f7.busted.help"
+            "help": "i18n:f7.busted.help",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "numberSum",
@@ -106,7 +109,11 @@
             "scope": "PARTICIPANT_ROUND",
             "control": "toggle",
             "usedBy": "formula:round.numbers",
-            "help": "i18n:f7.x2.help"
+            "help": "i18n:f7.x2.help",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "bonusSum",
@@ -126,7 +133,11 @@
             "type": "BOOLEAN",
             "scope": "PARTICIPANT_ROUND",
             "control": "toggle",
-            "usedBy": "formula:round.flip7"
+            "usedBy": "formula:round.flip7",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           }
         ]
       },
@@ -140,7 +151,11 @@
             "type": "BOOLEAN",
             "scope": "PARTICIPANT_ROUND",
             "control": "toggle",
-            "usedBy": "formula:round.busted"
+            "usedBy": "formula:round.busted",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "x2",
@@ -148,7 +163,11 @@
             "type": "BOOLEAN",
             "scope": "PARTICIPANT_ROUND",
             "control": "toggle",
-            "usedBy": "formula:round.numbers"
+            "usedBy": "formula:round.numbers",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           }
         ],
         "collections": [

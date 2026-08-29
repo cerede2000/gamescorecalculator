@@ -77,7 +77,10 @@
             "usedBy": "formula:cat.housing",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "housingStars",
@@ -88,7 +91,10 @@
             "usedBy": "formula:cat.housing",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "varHousing",
@@ -97,7 +103,11 @@
             "scope": "GAME",
             "control": "toggle",
             "usedBy": "formula:cat.housing",
-            "help": "i18n:ak.varHousing.help"
+            "help": "i18n:ak.varHousing.help",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "marketStd",
@@ -108,7 +118,10 @@
             "usedBy": "formula:cat.market",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "marketDbl",
@@ -118,7 +131,11 @@
             "control": "stepper",
             "usedBy": "formula:cat.market",
             "min": 0,
-            "step": 1
+            "step": 1,
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "marketStars",
@@ -129,7 +146,10 @@
             "usedBy": "formula:cat.market",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "barracksStd",
@@ -140,7 +160,10 @@
             "usedBy": "formula:cat.barracks",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "barracksDbl",
@@ -150,7 +173,11 @@
             "control": "stepper",
             "usedBy": "formula:cat.barracks",
             "min": 0,
-            "step": 1
+            "step": 1,
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "barracksStars",
@@ -161,7 +188,10 @@
             "usedBy": "formula:cat.barracks",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "templeStd",
@@ -172,7 +202,10 @@
             "usedBy": "formula:cat.temple",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "templeDbl",
@@ -182,7 +215,11 @@
             "control": "stepper",
             "usedBy": "formula:cat.temple",
             "min": 0,
-            "step": 1
+            "step": 1,
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "templeStars",
@@ -193,7 +230,10 @@
             "usedBy": "formula:cat.temple",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "gardenStd",
@@ -204,7 +244,10 @@
             "usedBy": "formula:cat.garden",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "gardenDbl",
@@ -214,7 +257,11 @@
             "control": "stepper",
             "usedBy": "formula:cat.garden",
             "min": 0,
-            "step": 1
+            "step": 1,
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "gardenStars",
@@ -225,7 +272,10 @@
             "usedBy": "formula:cat.garden",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "stones",
@@ -236,7 +286,10 @@
             "usedBy": "formula:stones",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           }
         ]
       },
@@ -253,7 +306,10 @@
             "usedBy": "formula:cat.housing",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "varHousing",
@@ -262,7 +318,11 @@
             "scope": "GAME",
             "control": "toggle",
             "usedBy": "formula:cat.housing",
-            "help": "i18n:ak.varHousing.help"
+            "help": "i18n:ak.varHousing.help",
+            "whenAbsent": {
+              "type": "BOOLEAN",
+              "value": "false"
+            }
           },
           {
             "id": "marketStars",
@@ -273,7 +333,10 @@
             "usedBy": "formula:cat.market",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "barracksStars",
@@ -284,7 +347,10 @@
             "usedBy": "formula:cat.barracks",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "templeStars",
@@ -295,7 +361,10 @@
             "usedBy": "formula:cat.temple",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "gardenStars",
@@ -306,7 +375,10 @@
             "usedBy": "formula:cat.garden",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           },
           {
             "id": "stones",
@@ -317,7 +389,10 @@
             "usedBy": "formula:stones",
             "min": 0,
             "step": 1,
-            "required": true
+            "whenAbsent": {
+              "type": "INTEGER",
+              "value": "0"
+            }
           }
         ],
         "collections": [

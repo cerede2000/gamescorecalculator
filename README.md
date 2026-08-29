@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 287 contrôles, aucune dépendance :
+Cinq portes, 292 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
@@ -66,9 +66,12 @@ Cinq portes, 287 contrôles, aucune dépendance :
   référence morte est refusée, une collection employée mais non déclarée est
   refusée, une politique non confirmée sans question est refusée, et une partie
   de référence déclarée sans fichier est refusée.
-- **Absent n'est pas zéro.** Un total incomplet vaut *inconnu*, la base interdit
-  d'encoder un inconnu par une chaîne vide, et un jeu qui refuse de classer sur
-  une donnée manquante le fait savoir — sans jamais lire l'absence comme un zéro.
+- **Absent n'est pas zéro**, sauf là où le jeu le déclare. Un total incomplet
+  vaut *inconnu*, la base interdit d'encoder un inconnu par une chaîne vide, et
+  un jeu qui refuse de classer sur une donnée manquante le fait savoir. Un jeu
+  peut déclarer l'inverse champ par champ (`whenAbsent`) : dans un décompte par
+  catégories, ne rien avoir dans une catégorie est un fait ordinaire. Akropolis
+  le fait, Dune non — et les deux comportements sont tenus par des tests.
 - **Les résultats des dossiers sont reproduits.** Bruno 74 et Chloé 46 devant
   Ada 46 aux Pierres ; Cy gagne à 223 alors qu'Ana a déclenché la fin ; Bo et Cy
   partagent la victoire à 20 survivants ; Duncan l'emporte à l'Eau en
@@ -91,6 +94,16 @@ Colony Bloodbath bascule entre saisie solo et multijoueur sans une ligne
 condition ne se désactive jamais lui-même — sinon on ne pourrait plus revenir
 en arrière — et une contribution exclusive écarte tout le reste.
 
+**Ce que vaut une case vide se déclare aussi.** Par défaut, absent veut dire
+inconnu et l'inconnu se propage — c'est ce qui protège un décompte contre un
+zéro inventé. Mais Akropolis multiplie chaque catégorie par ses étoiles : une
+seule case vide rendait le total entier inconnu, et il fallait remplir seize
+cases dont quatorze à zéro. Le champ peut donc déclarer `whenAbsent`, et la
+porte de publication refuse qu'un champ soit à la fois `required` et pourvu
+d'un défaut, ou que le défaut sorte du domaine annoncé. L'écran n'enregistre
+que ce qui a été réellement saisi : un défaut jamais touché reste absent de la
+base, c'est le moteur qui le fournit.
+
 Ce que chaque jeu y gagne :
 
 | Jeu | Pertinence déduite | Matériel déclaré |
@@ -98,6 +111,9 @@ Ce que chaque jeu y gagne :
 | Flip 7 | éliminé → plus rien d'autre à saisir | carte N en N exemplaires, une carte 0, un ×2, un de chaque bonus, 30 points de bonus en tout, pas de doublon chez un joueur |
 | Moon Colony Bloodbath | solo ↔ multijoueur, variante longue, objectif atteint | rien de confirmé |
 | Akropolis | rien à masquer : les cinq catégories comptent toujours | 40 cubes Pierre, et une Cité bornée par le nombre de tuiles en jeu |
+
+Akropolis est le seul jeu à déclarer qu'une case vide vaut zéro : deux cases
+suffisent à compter un joueur qui n'a que des Habitations.
 | Dune: Imperium | rien à masquer : un seul champ | rien de confirmé |
 
 **Le matériel est fini, et cela se déclare.** `scoringEngine.scarcity` porte

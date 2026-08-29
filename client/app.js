@@ -188,17 +188,29 @@ async function matchScreen(id) {
   let page = 0
   let draft = {}
 
+  /** Les champs que l'utilisateur a réellement touchés cette session, pour
+   *  distinguer « il a saisi zéro » de « le jeu déclare que vide vaut zéro ». */
+  const touched = new Set()
+
   const seed = () => {
     draft = {}
+    touched.clear()
     for (const p of [...st.participants.map(x => x.id), TABLE])
       draft[p] = {
         values: { ...(st.entered[round]?.[p]?.values ?? {}) },
         collections: { ...(st.entered[round]?.[p]?.collections ?? {}) }
       }
-    // un interrupteur n'a pas d'inconnu : à défaut il vaut « non »
     for (const f of mode.inputs) {
-      if (f.control !== 'toggle') continue
-      for (const p of scopeOwners(f)) if (draft[p].values[f.id] === undefined) draft[p].values[f.id] = { type: 'BOOLEAN', value: 'false' }
+      // un interrupteur n'a pas d'inconnu : à défaut il vaut « non ».
+      // un champ dont le jeu déclare ce que vaut l'absence part sur cette
+      // valeur, visible dans la case plutôt que devinée au calcul.
+      const fallback = f.control === 'toggle'
+        ? (f.whenAbsent ?? { type: 'BOOLEAN', value: 'false' })
+        : f.whenAbsent
+      if (!fallback) continue
+      for (const p of scopeOwners(f))
+        if (draft[p].values[f.id] === undefined || draft[p].values[f.id] === null)
+          draft[p].values[f.id] = fallback
     }
   }
   const isTable = f => f.scope === 'GAME' || f.scope === 'ROUND'
@@ -279,10 +291,18 @@ async function matchScreen(id) {
   /** Le compte des joueurs complets suit la frappe : un compteur figé à 0
    *  pendant qu'on remplit ment sur ce qu'il mesure. */
   const fill = el('span', { class: 'fill' })
+  /** Combien de joueurs ont été renseignés. Avec des valeurs par défaut,
+   *  « complet » ne veut plus rien dire : tout le monde le serait d'emblée.
+   *  La vraie question à la table est « ai-je fait le tour ? ». */
   function countFilled() {
     const own = mode.inputs.filter(f => !isTable(f))
-    const n = st.participants.filter(p => own.every(f => !isUnknown(draft[p.id].values[f.id]))).length
-    fill.textContent = (perRound ? `Manche ${round} · ` : '') + `${n}/${st.participants.length} complets`
+    const n = st.participants.filter(p =>
+      own.some(f => touched.has(`${p.id}:${f.id}`)) ||
+      Object.values(st.entered[round]?.[p.id]?.values ?? {}).some(v => !isUnknown(v)) ||
+      Object.keys(st.entered[round]?.[p.id]?.collections ?? {}).length > 0 ||
+      Object.values(draft[p.id].collections).some(items => items.length)
+    ).length
+    fill.textContent = (perRound ? `Manche ${round} · ` : '') + `${n}/${st.participants.length} renseignés`
   }
 
   function entry() {
@@ -408,7 +428,7 @@ async function matchScreen(id) {
 
   function fieldRow(f, owner) {
     const control = fieldControl(f, draft[owner].values[f.id] ?? null,
-      v => { draft[owner].values[f.id] = v; applyRules() })
+      v => { draft[owner].values[f.id] = v; touched.add(`${owner}:${f.id}`); applyRules() })
     const why = el('span', { class: 'moot-why' })
     const row = el('div', { class: 'field' },
       el('span', { class: 'lab' }, f.label,
@@ -425,9 +445,14 @@ async function matchScreen(id) {
     const inputs = {}
     for (const [owner, slot] of Object.entries(draft)) {
       const values = {}
+      const already = st.entered[round]?.[owner]?.values ?? {}
       for (const f of mode.inputs) {
         if (scopeOwner(f, owner) !== owner) continue
         if (isTable(f) !== (owner === TABLE)) continue
+        // On n'enregistre QUE ce qui a été dit. Une valeur par défaut jamais
+        // touchée reste absente de la base : c'est le moteur qui la fournit,
+        // et la partie garde trace de ce que les joueurs ont réellement saisi.
+        if (!touched.has(`${owner}:${f.id}`) && !(f.id in already)) continue
         values[f.id] = slot.values[f.id] ?? null
       }
       inputs[owner] = { values, collections: slot.collections }
