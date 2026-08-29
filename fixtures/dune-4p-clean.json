@@ -1,0 +1,21 @@
+{
+  "game": "dune-imperium",
+  "mode": "express",
+  "label": "Quatre joueurs sans égalité — la chaîne de départage n'est jamais atteinte",
+  "participants": [
+    { "id": "paul", "name": "Paul" }, { "id": "chani", "name": "Chani" },
+    { "id": "duncan", "name": "Duncan" }, { "id": "gurney", "name": "Gurney" }
+  ],
+  "rounds": [{
+    "paul":   { "finalVictoryPoints": { "type": "INTEGER", "value": "10" } },
+    "chani":  { "finalVictoryPoints": { "type": "INTEGER", "value": "8" } },
+    "duncan": { "finalVictoryPoints": { "type": "INTEGER", "value": "7" } },
+    "gurney": { "finalVictoryPoints": { "type": "INTEGER", "value": "4" } }
+  }],
+  "expect": {
+    "totals": { "paul": 10, "chani": 8, "duncan": 7, "gurney": 4 },
+    "ranks":  { "paul": 1, "chani": 2, "duncan": 3, "gurney": 4 },
+    "questions": 0
+  },
+  "note": "Aucune question n'est posée : les quatre critères de départage sont sautés dès que le score seul suffit."
+}

@@ -1,0 +1,304 @@
+{
+  "gameId": "moon-colony-bloodbath",
+  "version": "1.0.0",
+  "contract": "2.0",
+  "name": {
+    "fr": "Moon Colony Bloodbath"
+  },
+  "rulesVersion": {
+    "label": "Official Instruction Manual, Rio Grande Games 2024",
+    "confirmed": true
+  },
+  "playerCountRules": {
+    "min": 1,
+    "max": 5
+  },
+  "locales": [
+    "fr"
+  ],
+  "policies": [
+    {
+      "id": "habitantSum",
+      "status": "confirmed",
+      "provisional": "distinctPopulations",
+      "affectsScore": true,
+      "source": "livret p.7 : « counting both people on playmats, and printed on Buildings »",
+      "rationale": "Les jetons et les habitants imprimés sont deux populations distinctes."
+    },
+    {
+      "id": "tiebreak",
+      "status": "unconfirmed",
+      "question": "Aucun départage n'est prévu au-delà du nombre de survivants.",
+      "options": [
+        "sharedVictory"
+      ],
+      "provisional": "sharedVictory",
+      "affectsScore": false,
+      "source": null
+    }
+  ],
+  "setupAssistant": {
+    "enabled": true
+  },
+  "ui": {
+    "layout": "playerGrid",
+    "fieldsPerPlayer": 2
+  },
+  "scoringEngine": {
+    "modes": [
+      {
+        "id": "express",
+        "default": true,
+        "inputs": [
+          {
+            "id": "soloVariant",
+            "label": "i18n:mc.solo",
+            "type": "BOOLEAN",
+            "scope": "GAME",
+            "control": "toggle",
+            "usedBy": "formula:survivors"
+          },
+          {
+            "id": "extendedSolo",
+            "label": "i18n:mc.soloExt",
+            "type": "BOOLEAN",
+            "scope": "GAME",
+            "control": "toggle",
+            "usedBy": "formula:solo.robots"
+          },
+          {
+            "id": "moonBaseHabitants",
+            "label": "i18n:mc.moonBase",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:survivors",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "printedHabitants",
+            "label": "i18n:mc.printed",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:survivors",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "manualReached",
+            "label": "i18n:mc.manual",
+            "type": "BOOLEAN",
+            "scope": "GAME",
+            "control": "toggle",
+            "usedBy": "formula:solo.event"
+          },
+          {
+            "id": "eventNumber",
+            "label": "i18n:mc.event",
+            "type": "INTEGER",
+            "scope": "GAME",
+            "control": "stepper",
+            "usedBy": "formula:solo.event",
+            "min": 1,
+            "max": 13,
+            "step": 1
+          },
+          {
+            "id": "robotsAdded",
+            "label": "i18n:mc.robots",
+            "type": "INTEGER",
+            "scope": "GAME",
+            "control": "stepper",
+            "usedBy": "formula:solo.robots",
+            "min": 0,
+            "step": 1
+          }
+        ]
+      },
+      {
+        "id": "guided",
+        "derivesInputsOf": "express",
+        "inputs": [
+          {
+            "id": "soloVariant",
+            "label": "i18n:mc.solo",
+            "type": "BOOLEAN",
+            "scope": "GAME",
+            "control": "toggle",
+            "usedBy": "formula:survivors"
+          },
+          {
+            "id": "extendedSolo",
+            "label": "i18n:mc.soloExt",
+            "type": "BOOLEAN",
+            "scope": "GAME",
+            "control": "toggle",
+            "usedBy": "formula:solo.robots"
+          },
+          {
+            "id": "moonBaseHabitants",
+            "label": "i18n:mc.moonBase",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:survivors",
+            "min": 0,
+            "step": 1
+          },
+          {
+            "id": "manualReached",
+            "label": "i18n:mc.manual",
+            "type": "BOOLEAN",
+            "scope": "GAME",
+            "control": "toggle",
+            "usedBy": "formula:solo.event"
+          },
+          {
+            "id": "eventNumber",
+            "label": "i18n:mc.event",
+            "type": "INTEGER",
+            "scope": "GAME",
+            "control": "stepper",
+            "usedBy": "formula:solo.event",
+            "min": 1,
+            "max": 13,
+            "step": 1
+          },
+          {
+            "id": "robotsAdded",
+            "label": "i18n:mc.robots",
+            "type": "INTEGER",
+            "scope": "GAME",
+            "control": "stepper",
+            "usedBy": "formula:solo.robots",
+            "min": 0,
+            "step": 1
+          }
+        ],
+        "collections": [
+          {
+            "id": "buildings",
+            "label": "i18n:mc.col.buildings",
+            "kind": "valueList",
+            "usedBy": "derive:printedHabitants",
+            "min": 0,
+            "control": "keypad",
+            "help": "i18n:mc.col.buildings.help"
+          }
+        ],
+        "derive": [
+          {
+            "id": "printedHabitants",
+            "value": {
+              "op": "sumOver",
+              "collection": "buildings",
+              "each": {
+                "op": "ref",
+                "id": "$v"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "contributions": [
+      {
+        "code": "survivors",
+        "label": "i18n:mc.line.survivors",
+        "when": {
+          "op": "not",
+          "arg": {
+            "op": "ref",
+            "id": "soloVariant"
+          }
+        },
+        "value": {
+          "op": "add",
+          "args": [
+            {
+              "op": "ref",
+              "id": "moonBaseHabitants"
+            },
+            {
+              "op": "ref",
+              "id": "printedHabitants"
+            }
+          ]
+        }
+      },
+      {
+        "code": "solo.event",
+        "label": "i18n:mc.line.event",
+        "when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "ref",
+              "id": "soloVariant"
+            },
+            {
+              "op": "not",
+              "arg": {
+                "op": "ref",
+                "id": "extendedSolo"
+              }
+            },
+            {
+              "op": "not",
+              "arg": {
+                "op": "ref",
+                "id": "manualReached"
+              }
+            }
+          ]
+        },
+        "value": {
+          "op": "ref",
+          "id": "eventNumber"
+        }
+      },
+      {
+        "code": "solo.robots",
+        "label": "i18n:mc.line.robots",
+        "when": {
+          "op": "and",
+          "args": [
+            {
+              "op": "ref",
+              "id": "soloVariant"
+            },
+            {
+              "op": "ref",
+              "id": "extendedSolo"
+            }
+          ]
+        },
+        "value": {
+          "op": "ref",
+          "id": "robotsAdded"
+        }
+      }
+    ],
+    "ranking": {
+      "scope": "PARTICIPANT",
+      "criteria": [
+        {
+          "metric": "cumulative",
+          "direction": "DESC"
+        }
+      ],
+      "missingPolicy": "BLOCK",
+      "rankMode": "COMPETITION",
+      "remainingTie": "SHARED_WIN"
+    }
+  },
+  "fixtures": [
+    "mcb-multi-3p",
+    "mcb-solo-defeat",
+    "mcb-solo-extended"
+  ]
+}

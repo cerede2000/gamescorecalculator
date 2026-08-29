@@ -1,0 +1,101 @@
+{
+  "game": "flip7",
+  "mode": "express",
+  "label": "Manche 1 des dossiers — Ana 32, Bo 0, Cy 60",
+  "participants": [
+    {
+      "id": "ana",
+      "name": "Ana"
+    },
+    {
+      "id": "bo",
+      "name": "Bo"
+    },
+    {
+      "id": "cy",
+      "name": "Cy"
+    }
+  ],
+  "rounds": [
+    {
+      "ana": {
+        "busted": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "numberSum": {
+          "type": "INTEGER",
+          "value": "16"
+        },
+        "x2": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "bonusSum": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "flip7": {
+          "type": "BOOLEAN",
+          "value": "false"
+        }
+      },
+      "bo": {
+        "busted": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "numberSum": {
+          "type": "INTEGER",
+          "value": "7"
+        },
+        "x2": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "bonusSum": {
+          "type": "INTEGER",
+          "value": "4"
+        },
+        "flip7": {
+          "type": "BOOLEAN",
+          "value": "false"
+        }
+      },
+      "cy": {
+        "busted": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "numberSum": {
+          "type": "INTEGER",
+          "value": "39"
+        },
+        "x2": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "bonusSum": {
+          "type": "INTEGER",
+          "value": "6"
+        },
+        "flip7": {
+          "type": "BOOLEAN",
+          "value": "true"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "ana": 32,
+      "bo": 0,
+      "cy": 60
+    },
+    "ranks": {
+      "cy": 1,
+      "ana": 2,
+      "bo": 3
+    }
+  }
+}

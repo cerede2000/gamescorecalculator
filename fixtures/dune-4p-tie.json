@@ -1,0 +1,92 @@
+{
+  "game": "dune-imperium",
+  "mode": "express",
+  "label": "Trois joueurs à 12 — départage progressif jusqu'à l'Eau",
+  "participants": [
+    {
+      "id": "paul",
+      "name": "Paul"
+    },
+    {
+      "id": "chani",
+      "name": "Chani"
+    },
+    {
+      "id": "duncan",
+      "name": "Duncan"
+    },
+    {
+      "id": "gurney",
+      "name": "Gurney"
+    }
+  ],
+  "rounds": [
+    {
+      "paul": {
+        "finalVictoryPoints": {
+          "type": "INTEGER",
+          "value": "12"
+        }
+      },
+      "chani": {
+        "finalVictoryPoints": {
+          "type": "INTEGER",
+          "value": "12"
+        }
+      },
+      "duncan": {
+        "finalVictoryPoints": {
+          "type": "INTEGER",
+          "value": "12"
+        }
+      },
+      "gurney": {
+        "finalVictoryPoints": {
+          "type": "INTEGER",
+          "value": "9"
+        }
+      }
+    }
+  ],
+  "tiebreak": {
+    "spice": {
+      "paul": 3,
+      "chani": 5,
+      "duncan": 5,
+      "gurney": 0
+    },
+    "solari": {
+      "paul": 9,
+      "chani": 7,
+      "duncan": 7,
+      "gurney": 0
+    },
+    "water": {
+      "paul": 1,
+      "chani": 2,
+      "duncan": 4,
+      "gurney": 0
+    },
+    "garrisonTroops": {
+      "paul": 0,
+      "chani": 0,
+      "duncan": 0,
+      "gurney": 0
+    }
+  },
+  "expect": {
+    "totals": {
+      "paul": 12,
+      "chani": 12,
+      "duncan": 12,
+      "gurney": 9
+    },
+    "ranks": {
+      "duncan": 1,
+      "chani": 2,
+      "paul": 3,
+      "gurney": 4
+    },
+    "questions": 7
+  }
+}

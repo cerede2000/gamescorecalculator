@@ -1,0 +1,11 @@
+{
+  "name": "Tablée",
+  "short_name": "Tablée",
+  "description": "Assistant de comptage de points pour jeux de société.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EDF0EA",
+  "theme_color": "#15624A",
+  "lang": "fr",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

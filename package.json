@@ -1,0 +1,17 @@
+{
+  "name": "tablee",
+  "version": "0.1.0",
+  "description": "Assistant de comptage de points pour jeux de société. Un jeu est une donnée, pas du code.",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=25" },
+  "scripts": {
+    "start": "node server/main.ts",
+    "validate": "node cli/validate.ts",
+    "play": "node cli/play.ts",
+    "e2e": "node cli/e2e.ts",
+    "p0": "node p0/verdict.ts",
+    "p0b": "node p0/verdict-b.ts",
+    "test": "npm run validate && npm run play && npm run e2e && npm run p0 && npm run p0b"
+  }
+}

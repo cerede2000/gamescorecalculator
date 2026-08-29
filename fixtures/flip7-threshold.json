@@ -1,0 +1,101 @@
+{
+  "game": "flip7",
+  "mode": "express",
+  "label": "Fin ≠ victoire — Ana déclenche à 215, Cy gagne à 223",
+  "participants": [
+    {
+      "id": "ana",
+      "name": "Ana"
+    },
+    {
+      "id": "bo",
+      "name": "Bo"
+    },
+    {
+      "id": "cy",
+      "name": "Cy"
+    }
+  ],
+  "rounds": [
+    {
+      "ana": {
+        "busted": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "numberSum": {
+          "type": "INTEGER",
+          "value": "215"
+        },
+        "x2": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "bonusSum": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "flip7": {
+          "type": "BOOLEAN",
+          "value": "false"
+        }
+      },
+      "bo": {
+        "busted": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "numberSum": {
+          "type": "INTEGER",
+          "value": "139"
+        },
+        "x2": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "bonusSum": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "flip7": {
+          "type": "BOOLEAN",
+          "value": "false"
+        }
+      },
+      "cy": {
+        "busted": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "numberSum": {
+          "type": "INTEGER",
+          "value": "223"
+        },
+        "x2": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "bonusSum": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "flip7": {
+          "type": "BOOLEAN",
+          "value": "false"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "ana": 215,
+      "bo": 139,
+      "cy": 223
+    },
+    "ranks": {
+      "cy": 1,
+      "ana": 2,
+      "bo": 3
+    }
+  }
+}

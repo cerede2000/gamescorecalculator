@@ -1,0 +1,233 @@
+{
+  "game": "akropolis",
+  "mode": "express",
+  "label": "Partie des dossiers — Bruno 74, Chloé 46 (5 Pierres), Ada 46 (3 Pierres)",
+  "participants": [
+    {
+      "id": "ada",
+      "name": "Ada"
+    },
+    {
+      "id": "bruno",
+      "name": "Bruno"
+    },
+    {
+      "id": "chloe",
+      "name": "Chloé"
+    }
+  ],
+  "rounds": [
+    {
+      "ada": {
+        "housingValue": {
+          "type": "INTEGER",
+          "value": "9"
+        },
+        "housingStars": {
+          "type": "INTEGER",
+          "value": "3"
+        },
+        "varHousing": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "marketStd": {
+          "type": "INTEGER",
+          "value": "5"
+        },
+        "marketDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "marketStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "barracksStd": {
+          "type": "INTEGER",
+          "value": "5"
+        },
+        "barracksDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "barracksStars": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeStd": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "templeDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "gardenStd": {
+          "type": "INTEGER",
+          "value": "4"
+        },
+        "gardenDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "gardenStars": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "stones": {
+          "type": "INTEGER",
+          "value": "3"
+        }
+      },
+      "bruno": {
+        "housingValue": {
+          "type": "INTEGER",
+          "value": "10"
+        },
+        "housingStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "varHousing": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "marketStd": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "marketDbl": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "marketStars": {
+          "type": "INTEGER",
+          "value": "3"
+        },
+        "barracksStd": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "barracksDbl": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "barracksStars": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "templeStd": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "templeDbl": {
+          "type": "INTEGER",
+          "value": "3"
+        },
+        "templeStars": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "gardenStd": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "gardenDbl": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "gardenStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "stones": {
+          "type": "INTEGER",
+          "value": "1"
+        }
+      },
+      "chloe": {
+        "housingValue": {
+          "type": "INTEGER",
+          "value": "5"
+        },
+        "housingStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "varHousing": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "marketStd": {
+          "type": "INTEGER",
+          "value": "3"
+        },
+        "marketDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "marketStars": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "barracksStd": {
+          "type": "INTEGER",
+          "value": "4"
+        },
+        "barracksDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "barracksStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "templeStd": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "templeDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "templeStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "gardenStd": {
+          "type": "INTEGER",
+          "value": "8"
+        },
+        "gardenDbl": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "gardenStars": {
+          "type": "INTEGER",
+          "value": "2"
+        },
+        "stones": {
+          "type": "INTEGER",
+          "value": "5"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "ada": 46,
+      "bruno": 74,
+      "chloe": 46
+    },
+    "ranks": {
+      "bruno": 1,
+      "chloe": 2,
+      "ada": 3
+    }
+  }
+}

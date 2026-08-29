@@ -1,0 +1,71 @@
+{
+  "game": "flip7",
+  "mode": "guided",
+  "label": "Saisie guidée — mêmes 60 points que l'express, face à une manche perdue",
+  "participants": [
+    {
+      "id": "cy",
+      "name": "Cy"
+    },
+    {
+      "id": "bo",
+      "name": "Bo"
+    }
+  ],
+  "rounds": [
+    {
+      "cy": {
+        "values": {
+          "busted": {
+            "type": "BOOLEAN",
+            "value": "false"
+          },
+          "x2": {
+            "type": "BOOLEAN",
+            "value": "false"
+          }
+        },
+        "collections": {
+          "cards": [
+            5,
+            8,
+            12,
+            1,
+            0,
+            2,
+            11
+          ],
+          "bonuses": [
+            6
+          ]
+        }
+      },
+      "bo": {
+        "values": {
+          "busted": {
+            "type": "BOOLEAN",
+            "value": "true"
+          },
+          "x2": {
+            "type": "BOOLEAN",
+            "value": "false"
+          }
+        },
+        "collections": {
+          "cards": [],
+          "bonuses": []
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "cy": 60,
+      "bo": 0
+    },
+    "ranks": {
+      "cy": 1,
+      "bo": 2
+    }
+  }
+}

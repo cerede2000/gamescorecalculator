@@ -1,0 +1,877 @@
+{
+  "gameId": "akropolis",
+  "version": "1.0.0",
+  "contract": "2.0",
+  "name": {
+    "fr": "Akropolis"
+  },
+  "rulesVersion": {
+    "label": "livret officiel Gigamic 2022 (FR)",
+    "confirmed": true
+  },
+  "playerCountRules": {
+    "min": 2,
+    "max": 4
+  },
+  "locales": [
+    "fr"
+  ],
+  "policies": [
+    {
+      "id": "marketVariantFormula",
+      "status": "confirmed",
+      "provisional": "doubledExcludedFromStandard",
+      "affectsScore": true,
+      "source": "livret p.8 : « leurs points sont doublés »",
+      "rationale": "Un Marché doublé compte 2×, jamais 3×."
+    },
+    {
+      "id": "tiebreak",
+      "status": "confirmed",
+      "provisional": "mostStones",
+      "affectsScore": false,
+      "source": "livret p.7 : « le joueur ayant le plus de cubes Pierre »"
+    },
+    {
+      "id": "finalTiebreak",
+      "status": "unconfirmed",
+      "question": "Que faire si score ET Pierres sont identiques ? Le livret ne le prévoit pas.",
+      "options": [
+        "sharedVictory"
+      ],
+      "provisional": "sharedVictory",
+      "affectsScore": false,
+      "source": null
+    },
+    {
+      "id": "longGame3pPiles",
+      "status": "unconfirmed",
+      "question": "Répartition des 15 piles à 3 joueurs : 11 piles de 4 + 4 piles de 3 ? (56 tuiles, piles nécessairement inégales)",
+      "options": [
+        "11x4+4x3"
+      ],
+      "provisional": "11x4+4x3",
+      "affectsScore": false,
+      "source": "livret p.2 : « formez 19 piles (à 2 joueurs) ou 15 piles (à 3 joueurs) »"
+    }
+  ],
+  "setupAssistant": {
+    "enabled": true
+  },
+  "ui": {
+    "layout": "categoryPager",
+    "fieldsPerPlayer": 16
+  },
+  "scoringEngine": {
+    "modes": [
+      {
+        "id": "express",
+        "default": true,
+        "inputs": [
+          {
+            "id": "housingValue",
+            "label": "i18n:ak.housingValue",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.housing",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "housingStars",
+            "label": "i18n:ak.housingStars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.housing",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "varHousing",
+            "label": "i18n:ak.varHousing",
+            "type": "BOOLEAN",
+            "scope": "PARTICIPANT",
+            "control": "toggle",
+            "usedBy": "formula:cat.housing"
+          },
+          {
+            "id": "marketStd",
+            "label": "i18n:ak.market.std",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.market",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "marketDbl",
+            "label": "i18n:ak.market.dbl",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.market",
+            "min": 0,
+            "step": 1
+          },
+          {
+            "id": "marketStars",
+            "label": "i18n:ak.market.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.market",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "barracksStd",
+            "label": "i18n:ak.barracks.std",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.barracks",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "barracksDbl",
+            "label": "i18n:ak.barracks.dbl",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.barracks",
+            "min": 0,
+            "step": 1
+          },
+          {
+            "id": "barracksStars",
+            "label": "i18n:ak.barracks.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.barracks",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "templeStd",
+            "label": "i18n:ak.temple.std",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.temple",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "templeDbl",
+            "label": "i18n:ak.temple.dbl",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.temple",
+            "min": 0,
+            "step": 1
+          },
+          {
+            "id": "templeStars",
+            "label": "i18n:ak.temple.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.temple",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "gardenStd",
+            "label": "i18n:ak.garden.std",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.garden",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "gardenDbl",
+            "label": "i18n:ak.garden.dbl",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.garden",
+            "min": 0,
+            "step": 1
+          },
+          {
+            "id": "gardenStars",
+            "label": "i18n:ak.garden.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.garden",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "stones",
+            "label": "i18n:ak.stones",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:stones",
+            "min": 0,
+            "step": 1,
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "guided",
+        "derivesInputsOf": "express",
+        "inputs": [
+          {
+            "id": "housingStars",
+            "label": "i18n:ak.housingStars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.housing",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "varHousing",
+            "label": "i18n:ak.varHousing",
+            "type": "BOOLEAN",
+            "scope": "PARTICIPANT",
+            "control": "toggle",
+            "usedBy": "formula:cat.housing"
+          },
+          {
+            "id": "marketStars",
+            "label": "i18n:ak.market.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.market",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "barracksStars",
+            "label": "i18n:ak.barracks.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.barracks",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "templeStars",
+            "label": "i18n:ak.temple.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.temple",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "gardenStars",
+            "label": "i18n:ak.garden.stars",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:cat.garden",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "stones",
+            "label": "i18n:ak.stones",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:stones",
+            "min": 0,
+            "step": 1,
+            "required": true
+          }
+        ],
+        "collections": [
+          {
+            "id": "housingLevels",
+            "label": "i18n:ak.col.housing",
+            "kind": "keyedCounts",
+            "usedBy": "derive:housingValue",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "marketStdLevels",
+            "label": "i18n:ak.col.marketStd",
+            "kind": "keyedCounts",
+            "usedBy": "derive:marketStd",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "marketDblLevels",
+            "label": "i18n:ak.col.marketDbl",
+            "kind": "keyedCounts",
+            "usedBy": "derive:marketDbl",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "barracksStdLevels",
+            "label": "i18n:ak.col.barracksStd",
+            "kind": "keyedCounts",
+            "usedBy": "derive:barracksStd",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "barracksDblLevels",
+            "label": "i18n:ak.col.barracksDbl",
+            "kind": "keyedCounts",
+            "usedBy": "derive:barracksDbl",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "templeStdLevels",
+            "label": "i18n:ak.col.templeStd",
+            "kind": "keyedCounts",
+            "usedBy": "derive:templeStd",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "templeDblLevels",
+            "label": "i18n:ak.col.templeDbl",
+            "kind": "keyedCounts",
+            "usedBy": "derive:templeDbl",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "gardenStdLevels",
+            "label": "i18n:ak.col.gardenStd",
+            "kind": "keyedCounts",
+            "usedBy": "derive:gardenStd",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          },
+          {
+            "id": "gardenDblLevels",
+            "label": "i18n:ak.col.gardenDbl",
+            "kind": "keyedCounts",
+            "usedBy": "derive:gardenDbl",
+            "keyRange": {
+              "from": 1,
+              "to": null,
+              "suggest": 3,
+              "label": "i18n:ak.level"
+            },
+            "min": 0,
+            "control": "stepper"
+          }
+        ],
+        "derive": [
+          {
+            "id": "housingValue",
+            "value": {
+              "op": "sumOver",
+              "collection": "housingLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "marketStd",
+            "value": {
+              "op": "sumOver",
+              "collection": "marketStdLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "marketDbl",
+            "value": {
+              "op": "sumOver",
+              "collection": "marketDblLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "barracksStd",
+            "value": {
+              "op": "sumOver",
+              "collection": "barracksStdLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "barracksDbl",
+            "value": {
+              "op": "sumOver",
+              "collection": "barracksDblLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "templeStd",
+            "value": {
+              "op": "sumOver",
+              "collection": "templeStdLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "templeDbl",
+            "value": {
+              "op": "sumOver",
+              "collection": "templeDblLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "gardenStd",
+            "value": {
+              "op": "sumOver",
+              "collection": "gardenStdLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "gardenDbl",
+            "value": {
+              "op": "sumOver",
+              "collection": "gardenDblLevels",
+              "each": {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "$k"
+                  },
+                  {
+                    "op": "ref",
+                    "id": "$v"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "contributions": [
+      {
+        "code": "cat.housing",
+        "label": "i18n:ak.line.housing",
+        "value": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "ref",
+              "id": "housingValue"
+            },
+            {
+              "op": "ref",
+              "id": "housingStars"
+            },
+            {
+              "op": "if",
+              "cond": {
+                "op": "and",
+                "args": [
+                  {
+                    "op": "ref",
+                    "id": "varHousing"
+                  },
+                  {
+                    "op": "gte",
+                    "left": {
+                      "op": "ref",
+                      "id": "housingValue"
+                    },
+                    "right": {
+                      "op": "lit",
+                      "value": {
+                        "type": "INTEGER",
+                        "value": "10"
+                      }
+                    }
+                  }
+                ]
+              },
+              "then": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "2"
+                }
+              },
+              "else": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "1"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "code": "cat.market",
+        "label": "i18n:ak.line.market",
+        "value": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "ref",
+                  "id": "marketStd"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "lit",
+                      "value": {
+                        "type": "INTEGER",
+                        "value": "2"
+                      }
+                    },
+                    {
+                      "op": "ref",
+                      "id": "marketDbl"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "ref",
+              "id": "marketStars"
+            }
+          ]
+        }
+      },
+      {
+        "code": "cat.barracks",
+        "label": "i18n:ak.line.barracks",
+        "value": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "ref",
+                  "id": "barracksStd"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "lit",
+                      "value": {
+                        "type": "INTEGER",
+                        "value": "2"
+                      }
+                    },
+                    {
+                      "op": "ref",
+                      "id": "barracksDbl"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "ref",
+              "id": "barracksStars"
+            }
+          ]
+        }
+      },
+      {
+        "code": "cat.temple",
+        "label": "i18n:ak.line.temple",
+        "value": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "ref",
+                  "id": "templeStd"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "lit",
+                      "value": {
+                        "type": "INTEGER",
+                        "value": "2"
+                      }
+                    },
+                    {
+                      "op": "ref",
+                      "id": "templeDbl"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "ref",
+              "id": "templeStars"
+            }
+          ]
+        }
+      },
+      {
+        "code": "cat.garden",
+        "label": "i18n:ak.line.garden",
+        "value": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "ref",
+                  "id": "gardenStd"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "lit",
+                      "value": {
+                        "type": "INTEGER",
+                        "value": "2"
+                      }
+                    },
+                    {
+                      "op": "ref",
+                      "id": "gardenDbl"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "ref",
+              "id": "gardenStars"
+            }
+          ]
+        }
+      },
+      {
+        "code": "stones",
+        "label": "i18n:ak.line.stones",
+        "value": {
+          "op": "ref",
+          "id": "stones"
+        }
+      }
+    ],
+    "ranking": {
+      "scope": "PARTICIPANT",
+      "criteria": [
+        {
+          "metric": "cumulative",
+          "direction": "DESC"
+        }
+      ],
+      "missingPolicy": "BLOCK",
+      "rankMode": "COMPETITION",
+      "remainingTie": "DECLARED_TIE"
+    },
+    "tieBreakers": [
+      {
+        "metric": "stones",
+        "direction": "DESC",
+        "label": "i18n:ak.tb.stones"
+      }
+    ]
+  },
+  "fixtures": [
+    "akropolis-demo-3p",
+    "akropolis-livret-2p",
+    "akropolis-guided-equiv"
+  ]
+}

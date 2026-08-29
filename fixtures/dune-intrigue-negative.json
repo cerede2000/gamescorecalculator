@@ -1,0 +1,33 @@
+{
+  "game": "dune-imperium",
+  "mode": "guided",
+  "label": "Guidée — score visible 12, Intrigue −3",
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Joueur"
+    }
+  ],
+  "rounds": [
+    {
+      "p1": {
+        "visibleVictoryPoints": {
+          "type": "INTEGER",
+          "value": "12"
+        },
+        "endgameIntrigueAdjustment": {
+          "type": "INTEGER",
+          "value": "-3"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "p1": 9
+    },
+    "ranks": {
+      "p1": 1
+    }
+  }
+}

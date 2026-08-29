@@ -1,0 +1,53 @@
+{
+  "game": "moon-colony-bloodbath",
+  "mode": "express",
+  "label": "Solo — défaite à l'Event 12",
+  "participants": [
+    {
+      "id": "solo",
+      "name": "Joueur"
+    }
+  ],
+  "rounds": [
+    {
+      "solo": {
+        "soloVariant": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "extendedSolo": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "moonBaseHabitants": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "printedHabitants": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "manualReached": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "eventNumber": {
+          "type": "INTEGER",
+          "value": "12"
+        },
+        "robotsAdded": {
+          "type": "INTEGER",
+          "value": "0"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "solo": 12
+    },
+    "ranks": {
+      "solo": 1
+    }
+  }
+}

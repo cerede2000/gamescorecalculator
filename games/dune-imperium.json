@@ -1,0 +1,219 @@
+{
+  "gameId": "dune-imperium",
+  "version": "1.0.0",
+  "contract": "2.0",
+  "name": {
+    "fr": "Dune: Imperium"
+  },
+  "rulesVersion": {
+    "label": "livret officiel jeu de base (FR)",
+    "confirmed": true
+  },
+  "playerCountRules": {
+    "min": 1,
+    "max": 4
+  },
+  "locales": [
+    "fr"
+  ],
+  "policies": [
+    {
+      "id": "startingVP",
+      "status": "confirmed",
+      "provisional": "1at4players",
+      "affectsScore": true,
+      "source": "livret G2 : « à 4 joueurs sur le 1. Sinon, sur le 0 »"
+    },
+    {
+      "id": "cubes",
+      "status": "confirmed",
+      "provisional": "4influence_12troops",
+      "affectsScore": false,
+      "source": "livret G5 : « Les 12 autres cubes représentent vos troupes »",
+      "rationale": "16 = 4 Influence + 12, dont 3 en garnison et 9 en réserve."
+    },
+    {
+      "id": "tiebreakChain",
+      "status": "confirmed",
+      "provisional": "spice_solari_water_troops",
+      "affectsScore": false,
+      "source": "livret : « le plus : d'Épice, de Solari, d'eau, ou enfin de troupes en garnison »"
+    },
+    {
+      "id": "finalTiebreak",
+      "status": "unconfirmed",
+      "question": "Rien n'est prévu si l'égalité persiste après les troupes en garnison.",
+      "options": [
+        "sharedVictory"
+      ],
+      "provisional": "sharedVictory",
+      "affectsScore": false,
+      "source": null
+    }
+  ],
+  "setupAssistant": {
+    "enabled": true,
+    "playerCountRules": {
+      "min": 3,
+      "max": 4
+    },
+    "outOfScopeNotice": "i18n:du.setup.outOfScope"
+  },
+  "ui": {
+    "layout": "playerGrid",
+    "fieldsPerPlayer": 1
+  },
+  "scoringEngine": {
+    "modes": [
+      {
+        "id": "express",
+        "default": true,
+        "inputs": [
+          {
+            "id": "finalVictoryPoints",
+            "label": "i18n:du.finalVP",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:victoryPoints",
+            "min": 0,
+            "step": 1,
+            "required": true
+          }
+        ]
+      },
+      {
+        "id": "guided",
+        "derivesInputsOf": "express",
+        "inputs": [
+          {
+            "id": "visibleVictoryPoints",
+            "label": "i18n:du.visibleVP",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "stepper",
+            "usedBy": "formula:victoryPoints",
+            "min": 0,
+            "step": 1,
+            "required": true
+          },
+          {
+            "id": "endgameIntrigueAdjustment",
+            "label": "i18n:du.intrigue",
+            "type": "INTEGER",
+            "scope": "PARTICIPANT",
+            "control": "keypad",
+            "usedBy": "formula:victoryPoints",
+            "step": 1
+          }
+        ],
+        "derive": [
+          {
+            "id": "finalVictoryPoints",
+            "value": {
+              "op": "add",
+              "args": [
+                {
+                  "op": "ref",
+                  "id": "visibleVictoryPoints"
+                },
+                {
+                  "op": "ref",
+                  "id": "endgameIntrigueAdjustment"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "contributions": [
+      {
+        "code": "victoryPoints",
+        "label": "i18n:du.line.vp",
+        "value": {
+          "op": "ref",
+          "id": "finalVictoryPoints"
+        }
+      }
+    ],
+    "endConditions": [
+      {
+        "code": "threshold",
+        "label": "i18n:du.end.threshold",
+        "level": "match",
+        "on": [
+          "ScoreCommitted"
+        ],
+        "timing": "endOfRound",
+        "mode": "auto",
+        "reversible": true,
+        "when": {
+          "op": "gte",
+          "left": {
+            "op": "ref",
+            "id": "cumulative"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "10"
+            }
+          }
+        }
+      }
+    ],
+    "ranking": {
+      "scope": "PARTICIPANT",
+      "criteria": [
+        {
+          "metric": "cumulative",
+          "direction": "DESC"
+        }
+      ],
+      "missingPolicy": "BLOCK",
+      "rankMode": "COMPETITION",
+      "remainingTie": "DECLARED_TIE"
+    },
+    "tieBreakers": [
+      {
+        "metric": "spice",
+        "direction": "DESC",
+        "acquire": "onDemand",
+        "label": "i18n:du.tb.spice"
+      },
+      {
+        "metric": "solari",
+        "direction": "DESC",
+        "acquire": "onDemand",
+        "label": "i18n:du.tb.solari"
+      },
+      {
+        "metric": "water",
+        "direction": "DESC",
+        "acquire": "onDemand",
+        "label": "i18n:du.tb.water"
+      },
+      {
+        "metric": "garrisonTroops",
+        "direction": "DESC",
+        "acquire": "onDemand",
+        "label": "i18n:du.tb.troops"
+      }
+    ]
+  },
+  "fixtures": [
+    "dune-4p-tie",
+    "dune-4p-clean",
+    "dune-intrigue-negative"
+  ],
+  "scopeNotes": [
+    {
+      "id": "houseHagalSetup",
+      "kind": "productScope",
+      "text": "Les parties à 1 et 2 joueurs utilisent la Maison Hagal, dont la mise en place figure sur une fiche séparée. Elle n'est pas couverte par l'assistant. Le décompte et le classement fonctionnent normalement dans ces configurations.",
+      "source": "livret : « Retrouvez ces instructions sur la fiche de règles séparée »"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "game": "flip7",
+  "mode": "express",
+  "label": "Une manche perdue écarte tout le reste, même une grosse main",
+  "participants": [{ "id": "ana", "name": "Ana" }, { "id": "bo", "name": "Bo" }],
+  "rounds": [{
+    "ana": {
+      "busted":    { "type": "BOOLEAN", "value": "true" },
+      "numberSum": { "type": "INTEGER", "value": "45" },
+      "x2":        { "type": "BOOLEAN", "value": "true" },
+      "bonusSum":  { "type": "INTEGER", "value": "10" },
+      "flip7":     { "type": "BOOLEAN", "value": "false" }
+    },
+    "bo": {
+      "busted":    { "type": "BOOLEAN", "value": "false" },
+      "numberSum": { "type": "INTEGER", "value": "20" },
+      "x2":        { "type": "BOOLEAN", "value": "true" },
+      "bonusSum":  { "type": "INTEGER", "value": "4" },
+      "flip7":     { "type": "BOOLEAN", "value": "false" }
+    }
+  }],
+  "expect": {
+    "totals": { "ana": 0, "bo": 44 },
+    "ranks":  { "bo": 1, "ana": 2 }
+  },
+  "note": "Ana aurait marqué 45×2 + 10 = 100 sans l'élimination : la contribution exclusive écarte les autres au lieu de les additionner à zéro. Bo : 20×2 = 40, plus 4 de bonus, le ×2 ne touchant pas les bonus."
+}

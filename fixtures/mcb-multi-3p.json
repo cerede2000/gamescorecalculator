@@ -1,0 +1,125 @@
+{
+  "game": "moon-colony-bloodbath",
+  "mode": "express",
+  "label": "Bo et Cy à 20 survivants — victoire partagée",
+  "participants": [
+    {
+      "id": "ana",
+      "name": "Ana"
+    },
+    {
+      "id": "bo",
+      "name": "Bo"
+    },
+    {
+      "id": "cy",
+      "name": "Cy"
+    }
+  ],
+  "rounds": [
+    {
+      "ana": {
+        "soloVariant": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "extendedSolo": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "moonBaseHabitants": {
+          "type": "INTEGER",
+          "value": "12"
+        },
+        "printedHabitants": {
+          "type": "INTEGER",
+          "value": "7"
+        },
+        "manualReached": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "eventNumber": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "robotsAdded": {
+          "type": "INTEGER",
+          "value": "0"
+        }
+      },
+      "bo": {
+        "soloVariant": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "extendedSolo": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "moonBaseHabitants": {
+          "type": "INTEGER",
+          "value": "9"
+        },
+        "printedHabitants": {
+          "type": "INTEGER",
+          "value": "11"
+        },
+        "manualReached": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "eventNumber": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "robotsAdded": {
+          "type": "INTEGER",
+          "value": "0"
+        }
+      },
+      "cy": {
+        "soloVariant": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "extendedSolo": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "moonBaseHabitants": {
+          "type": "INTEGER",
+          "value": "14"
+        },
+        "printedHabitants": {
+          "type": "INTEGER",
+          "value": "6"
+        },
+        "manualReached": {
+          "type": "BOOLEAN",
+          "value": "false"
+        },
+        "eventNumber": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "robotsAdded": {
+          "type": "INTEGER",
+          "value": "0"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "ana": 19,
+      "bo": 20,
+      "cy": 20
+    },
+    "ranks": {
+      "bo": 1,
+      "cy": 1,
+      "ana": 3
+    }
+  }
+}

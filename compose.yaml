@@ -1,0 +1,15 @@
+services:
+  tablee:
+    build: .
+    image: ghcr.io/cerede2000/gamescorecalculator:latest
+    container_name: tablee
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: Europe/Paris
+    volumes:
+      - tablee-data:/data
+
+volumes:
+  tablee-data:

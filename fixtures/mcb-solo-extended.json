@@ -1,0 +1,53 @@
+{
+  "game": "moon-colony-bloodbath",
+  "mode": "express",
+  "label": "Solo prolongé — 7 Robots",
+  "participants": [
+    {
+      "id": "solo",
+      "name": "Joueur"
+    }
+  ],
+  "rounds": [
+    {
+      "solo": {
+        "soloVariant": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "extendedSolo": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "moonBaseHabitants": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "printedHabitants": {
+          "type": "INTEGER",
+          "value": "0"
+        },
+        "manualReached": {
+          "type": "BOOLEAN",
+          "value": "true"
+        },
+        "eventNumber": {
+          "type": "INTEGER",
+          "value": "1"
+        },
+        "robotsAdded": {
+          "type": "INTEGER",
+          "value": "7"
+        }
+      }
+    }
+  ],
+  "expect": {
+    "totals": {
+      "solo": 7
+    },
+    "ranks": {
+      "solo": 1
+    }
+  }
+}

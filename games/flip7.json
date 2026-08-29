@@ -1,0 +1,352 @@
+{
+  "gameId": "flip7",
+  "version": "1.0.0",
+  "contract": "2.0",
+  "name": {
+    "fr": "Flip 7"
+  },
+  "rulesVersion": {
+    "label": "synthèse fournie 2026-08-29",
+    "confirmed": false
+  },
+  "playerCountRules": {
+    "min": 2,
+    "max": null,
+    "softMax": 8
+  },
+  "locales": [
+    "fr"
+  ],
+  "policies": [
+    {
+      "id": "x2Stacking",
+      "status": "confirmed",
+      "provisional": "single",
+      "affectsScore": true,
+      "source": "détenteur des règles, 2026-08-29",
+      "rationale": "Le paquet ne contient qu'un seul x2 : le cumul est impossible."
+    },
+    {
+      "id": "bonusValues",
+      "status": "confirmed",
+      "provisional": "even2to10",
+      "affectsScore": false,
+      "source": "détenteur des règles, 2026-08-29",
+      "rationale": "Valeurs paires de +2 à +10."
+    },
+    {
+      "id": "finalTiebreak",
+      "status": "unconfirmed",
+      "question": "Comment départager deux joueurs au même score cumulé ?",
+      "options": [
+        "sharedVictory",
+        "mostFlip7",
+        "fewestBusts"
+      ],
+      "provisional": "sharedVictory",
+      "affectsScore": false,
+      "source": null
+    }
+  ],
+  "ui": {
+    "layout": "playerGrid",
+    "fieldsPerPlayer": 5
+  },
+  "scoringEngine": {
+    "modes": [
+      {
+        "id": "express",
+        "default": true,
+        "inputs": [
+          {
+            "id": "busted",
+            "label": "i18n:f7.busted",
+            "type": "BOOLEAN",
+            "scope": "PARTICIPANT_ROUND",
+            "control": "toggle",
+            "required": true,
+            "usedBy": "formula:round.busted",
+            "help": "i18n:f7.busted.help"
+          },
+          {
+            "id": "numberSum",
+            "label": "i18n:f7.numberSum",
+            "type": "INTEGER",
+            "min": 0,
+            "step": 1,
+            "scope": "PARTICIPANT_ROUND",
+            "control": "stepper",
+            "required": true,
+            "usedBy": "formula:round.numbers"
+          },
+          {
+            "id": "x2",
+            "label": "i18n:f7.x2",
+            "type": "BOOLEAN",
+            "scope": "PARTICIPANT_ROUND",
+            "control": "toggle",
+            "usedBy": "formula:round.numbers",
+            "help": "i18n:f7.x2.help"
+          },
+          {
+            "id": "bonusSum",
+            "label": "i18n:f7.bonusSum",
+            "type": "INTEGER",
+            "min": 0,
+            "scope": "PARTICIPANT_ROUND",
+            "control": "stepper",
+            "usedBy": "formula:round.bonus",
+            "step": 2,
+            "help": "i18n:f7.bonusSum.help"
+          },
+          {
+            "id": "flip7",
+            "label": "i18n:f7.flip7",
+            "type": "BOOLEAN",
+            "scope": "PARTICIPANT_ROUND",
+            "control": "toggle",
+            "usedBy": "formula:round.flip7"
+          }
+        ]
+      },
+      {
+        "id": "guided",
+        "derivesInputsOf": "express",
+        "inputs": [
+          {
+            "id": "busted",
+            "label": "i18n:f7.busted",
+            "type": "BOOLEAN",
+            "scope": "PARTICIPANT_ROUND",
+            "control": "toggle",
+            "usedBy": "formula:round.busted"
+          },
+          {
+            "id": "x2",
+            "label": "i18n:f7.x2",
+            "type": "BOOLEAN",
+            "scope": "PARTICIPANT_ROUND",
+            "control": "toggle",
+            "usedBy": "formula:round.numbers"
+          }
+        ],
+        "collections": [
+          {
+            "id": "cards",
+            "label": "i18n:f7.cards",
+            "kind": "valueList",
+            "usedBy": "derive:numberSum",
+            "values": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12
+            ],
+            "control": "chips",
+            "help": "i18n:f7.cards.help"
+          },
+          {
+            "id": "bonuses",
+            "label": "i18n:f7.bonuses",
+            "kind": "valueList",
+            "usedBy": "derive:bonusSum",
+            "values": [
+              2,
+              4,
+              6,
+              8,
+              10
+            ],
+            "control": "chips",
+            "help": "i18n:f7.bonuses.help"
+          }
+        ],
+        "derive": [
+          {
+            "id": "numberSum",
+            "value": {
+              "op": "sumOver",
+              "collection": "cards",
+              "each": {
+                "op": "ref",
+                "id": "$v"
+              }
+            }
+          },
+          {
+            "id": "flip7",
+            "value": {
+              "op": "eq",
+              "left": {
+                "op": "countDistinct",
+                "collection": "cards"
+              },
+              "right": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "7"
+                }
+              }
+            }
+          },
+          {
+            "id": "bonusSum",
+            "value": {
+              "op": "sumOver",
+              "collection": "bonuses",
+              "each": {
+                "op": "ref",
+                "id": "$v"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "contributions": [
+      {
+        "code": "round.busted",
+        "label": "i18n:f7.line.busted",
+        "exclusive": true,
+        "when": {
+          "op": "ref",
+          "id": "busted"
+        },
+        "value": {
+          "op": "lit",
+          "value": {
+            "type": "INTEGER",
+            "value": "0"
+          }
+        }
+      },
+      {
+        "code": "round.numbers",
+        "label": "i18n:f7.line.numbers",
+        "value": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "ref",
+              "id": "numberSum"
+            },
+            {
+              "op": "if",
+              "cond": {
+                "op": "ref",
+                "id": "x2"
+              },
+              "then": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "2"
+                }
+              },
+              "else": {
+                "op": "lit",
+                "value": {
+                  "type": "INTEGER",
+                  "value": "1"
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "code": "round.bonus",
+        "label": "i18n:f7.line.bonus",
+        "when": {
+          "op": "gt",
+          "left": {
+            "op": "ref",
+            "id": "bonusSum"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "0"
+            }
+          }
+        },
+        "value": {
+          "op": "ref",
+          "id": "bonusSum"
+        }
+      },
+      {
+        "code": "round.flip7",
+        "label": "i18n:f7.line.flip7",
+        "when": {
+          "op": "ref",
+          "id": "flip7"
+        },
+        "value": {
+          "op": "lit",
+          "value": {
+            "type": "INTEGER",
+            "value": "15"
+          }
+        }
+      }
+    ],
+    "endConditions": [
+      {
+        "code": "threshold",
+        "label": "i18n:f7.end.threshold",
+        "level": "match",
+        "on": [
+          "ScoreCommitted"
+        ],
+        "timing": "endOfRound",
+        "mode": "confirm",
+        "reversible": true,
+        "explain": "i18n:f7.end.threshold.explain",
+        "when": {
+          "op": "gte",
+          "left": {
+            "op": "ref",
+            "id": "cumulative"
+          },
+          "right": {
+            "op": "lit",
+            "value": {
+              "type": "INTEGER",
+              "value": "200"
+            }
+          }
+        }
+      }
+    ],
+    "ranking": {
+      "scope": "PARTICIPANT",
+      "criteria": [
+        {
+          "metric": "cumulative",
+          "direction": "DESC"
+        }
+      ],
+      "missingPolicy": "BLOCK",
+      "rankMode": "COMPETITION",
+      "remainingTie": "DECLARED_TIE"
+    }
+  },
+  "fixtures": [
+    "flip7-demo-3p",
+    "flip7-guided",
+    "flip7-threshold",
+    "flip7-busted"
+  ]
+}
