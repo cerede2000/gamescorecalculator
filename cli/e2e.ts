@@ -18,6 +18,16 @@ const ok = (l: string, c: boolean, d = '') => {
   c ? (pass++, console.log(`  ${g('✓')} ${l}`)) : (fail++, console.log(`  ${r('✗')} ${l} ${d}`))
 }
 
+/** Les sections effectivement exécutées, listées à la fin. Un total de
+ *  contrôles qui baisse reste plausible ; une section absente de la liste,
+ *  non. */
+const sections: { name: string; from: number }[] = []
+const section = (name: string) => {
+  console.log()
+  console.log(b(name))
+  sections.push({ name, from: pass + fail })
+}
+
 const child = spawn(process.execPath,
   ['--experimental-strip-types', '--disable-warning=ExperimentalWarning', 'server/main.ts'],
   { env: { ...process.env, PORT: String(PORT), HOST: '127.0.0.1', TABLEE_DB: DB }, stdio: 'ignore' })
@@ -112,7 +122,7 @@ for (const file of readdirSync('fixtures').sort()) {
 }
 
 // ── les refus que le serveur doit opposer ─────────────────────────────────
-console.log(b('Ce que le serveur refuse'))
+section('Ce que le serveur refuse')
 const okCase = async (label: string, fn: () => Promise<unknown>) => {
   try { await fn(); ok(label, true) } catch (e: any) { ok(label, false, `— refusé : ${e.message}`) }
 }
@@ -141,8 +151,7 @@ await refuse('un critère de départage qui n\'existe pas', () => call('POST', `
   { metric: 'chance', values: {} }))
 
 // ── absent n'est pas zéro, sauf là où le jeu le déclare ───────────────────
-console.log()
-console.log(b('Absent n\'est pas zéro'))
+section('Absent n\'est pas zéro')
 {
   // Dune ne déclare aucune valeur par défaut : l'absence y reste l'inconnu
   let inc = await call('POST', '/api/matches', {
@@ -192,8 +201,7 @@ console.log(b('Absent n\'est pas zéro'))
 }
 
 // ── ce que le matériel interdit ───────────────────────────────────────────
-console.log()
-console.log(b('Le matériel est fini'))
+section('Le matériel est fini')
 const f7 = async () => call('POST', '/api/matches', {
   gameId: 'flip7', mode: 'guided',
   players: [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }]
@@ -273,8 +281,7 @@ await okCase('le paquet entier de bonus réparti entre deux joueurs', async () =
 })
 
 // ── le plafond qui dépend de la configuration ─────────────────────────────
-console.log()
-console.log(b('Une Cité ne peut pas contenir plus de Quartiers que la boîte'))
+section('Une Cité ne peut pas contenir plus de Quartiers que la boîte')
 {
   const cite = (n: number) => ({ values: {}, collections: { housingLevels: [[1, n]] } })
   const table = async (players: number, quartiers: number) => {
@@ -294,8 +301,7 @@ console.log(b('Une Cité ne peut pas contenir plus de Quartiers que la boîte'))
 }
 
 // ── les règles atteignent la saisie ───────────────────────────────────────
-console.log()
-console.log(b('Les règles atteignent la saisie'))
+section('Les règles atteignent la saisie')
 {
   const { relevance } = await import('../packages/rules-core/src/relevance.ts')
   const bundle = JSON.parse(readFileSync('games/flip7.json', 'utf8'))
@@ -321,8 +327,7 @@ console.log(b('Les règles atteignent la saisie'))
 }
 
 // ── la règle des 200 points ───────────────────────────────────────────────
-console.log()
-console.log(b('Égalité à 200 : on joue une manche supplémentaire'))
+section('Égalité à 200 : on joue une manche supplémentaire')
 {
   const round = (st: any, n: number, byPlayer: Record<string, number | 'out'>) =>
     call('PUT', `/api/matches/${st.match.id}/rounds/${n}`, {
@@ -353,8 +358,7 @@ console.log(b('Égalité à 200 : on joue une manche supplémentaire'))
      N(st.totals.a) === 222 && N(st.totals.b) === 210)
 }
 // ── corriger et supprimer une manche ──────────────────────────────────────
-console.log()
-console.log(b('Revenir sur une manche'))
+section('Revenir sur une manche')
 {
   const mk = () => call('POST', '/api/matches', {
     gameId: 'flip7', mode: 'express',
@@ -411,8 +415,7 @@ console.log(b('Revenir sur une manche'))
 }
 
 // ── idempotence ───────────────────────────────────────────────────────────
-console.log()
-console.log(b('Idempotence'))
+section('Idempotence')
 let idem = await call('POST', '/api/matches', {
   gameId: 'dune-imperium', players: [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }]
 })
@@ -427,6 +430,11 @@ ok('la même commande rejouée rend le même résultat', JSON.stringify(first) =
 ok('et n\'a pas fait avancer la version deux fois', second.match.version === first.match.version)
 
 console.log('\n' + '─'.repeat(66))
-console.log(b(`${pass} réussis · ${fail} échoués`))
+for (let i = 0; i < sections.length; i++) {
+  const n = (sections[i + 1]?.from ?? pass + fail) - sections[i].from
+  console.log(dim(`  ${String(n).padStart(3)} · ${sections[i].name}`))
+}
+console.log('─'.repeat(66))
+console.log(b(`${sections.length} sections · ${pass} réussis · ${fail} échoués`))
 console.log('─'.repeat(66))
 process.exit(fail === 0 ? 0 : 1)
