@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 264 contrôles, aucune dépendance :
+Cinq portes, 269 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|

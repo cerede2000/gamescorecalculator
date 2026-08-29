@@ -245,6 +245,39 @@ console.log(b('Les règles atteignent la saisie'))
      off(relevance(ak, ak.scoringEngine.modes[0], {})) === '')
 }
 
+// ── la règle des 200 points ───────────────────────────────────────────────
+console.log()
+console.log(b('Égalité à 200 : on joue une manche supplémentaire'))
+{
+  const round = (st: any, n: number, byPlayer: Record<string, number | 'out'>) =>
+    call('PUT', `/api/matches/${st.match.id}/rounds/${n}`, {
+      expectedVersion: st.match.version,
+      inputs: Object.fromEntries(Object.entries(byPlayer).map(([id, v]) => [id, {
+        values: v === 'out'
+          ? { busted: true, numberSum: 0, x2: false, bonusSum: 0, flip7: false }
+          : { busted: false, numberSum: v, x2: false, bonusSum: 0, flip7: false }
+      }]))
+    })
+
+  let st = await call('POST', '/api/matches', {
+    gameId: 'flip7', mode: 'express',
+    players: [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }]
+  })
+  st = await round(st, 1, { a: 50, b: 50 })
+  st = await round(st, 2, { a: 160, b: 160 })
+  ok('à 210 partout, la partie ne se termine pas', st.triggers.length === 0)
+  ok('et l\'écran dit pourquoi',
+     st.gameNotices.some((n: any) => n.code === 'tieAtThreshold'),
+     JSON.stringify(st.gameNotices))
+
+  st = await round(st, 3, { a: 12, b: 'out' })
+  ok('après la manche de départage, la partie se termine',
+     st.triggers.some((t: any) => t.code === 'threshold'))
+  ok('et plus aucun avis d\'égalité', st.gameNotices.length === 0)
+  ok('Ana l\'emporte 222 à 210',
+     N(st.totals.a) === 222 && N(st.totals.b) === 210)
+}
+
 // ── idempotence ───────────────────────────────────────────────────────────
 console.log()
 console.log(b('Idempotence'))
