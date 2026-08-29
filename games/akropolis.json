@@ -880,6 +880,56 @@
         "usedBy": "formula:stones",
         "message": "i18n:ak.scarcity.stones",
         "source": "livret, matériel : « 40 cubes Pierre »"
+      },
+      {
+        "id": "cityHexes",
+        "label": "i18n:ak.hexes",
+        "kind": "supply",
+        "per": "each",
+        "targets": [
+          "housingLevels",
+          "marketStdLevels",
+          "marketDblLevels",
+          "barracksStdLevels",
+          "barracksDblLevels",
+          "templeStdLevels",
+          "templeDblLevels",
+          "gardenStdLevels",
+          "gardenDblLevels"
+        ],
+        "limitExpr": {
+          "op": "bracket",
+          "input": {
+            "op": "ref",
+            "id": "playerCount"
+          },
+          "table": [
+            {
+              "upTo": 2,
+              "value": {
+                "type": "INTEGER",
+                "value": "93"
+              }
+            },
+            {
+              "upTo": 3,
+              "value": {
+                "type": "INTEGER",
+                "value": "63"
+              }
+            },
+            {
+              "upTo": 4,
+              "value": {
+                "type": "INTEGER",
+                "value": "48"
+              }
+            }
+          ]
+        },
+        "usedBy": "derive:housingValue",
+        "message": "i18n:ak.scarcity.hexes",
+        "source": "livret : « une tuile Cité est composée de 3 hexagones », 61 tuiles, 11 piles de 3/4/5 selon le nombre de joueurs, la dernière tuile du Chantier n'est jamais jouée, et la tuile de départ apporte 3 Quartiers"
       }
     ]
   },

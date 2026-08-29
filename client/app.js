@@ -2,7 +2,7 @@
 // on prépare la table, la partie se joue, on saisit le résultat, on classe.
 
 import { api, ApiError, show, isUnknown, num, INT, uuid } from './api.js'
-import { el, clear, toast } from './dom.js'
+import { el, clear, toast, confirmAction } from './dom.js'
 
 /** name est un dictionnaire de locales dans le bundle ; l'API le résout ailleurs. */
 const gname = g => (typeof g.name === 'string' ? g.name : (g.name?.fr ?? g.gameId))
@@ -288,6 +288,7 @@ async function matchScreen(id) {
   function entry() {
     wired.length = 0
     main.append(el('h2', {}, perRound ? `Saisie — manche ${round}` : 'Saisie'))
+    if (perRound) main.append(roundPager())
 
     const tableFields = mode.inputs.filter(isTable)
     if (tableFields.length)
@@ -312,15 +313,61 @@ async function matchScreen(id) {
     }
 
     bar(fill,
-      perRound && round > 1
-        ? el('button', { class: 'btn ghost', onclick: () => { round--; seed(); render() } }, '‹ manche précédente')
-        : null,
       el('button', { class: 'btn', onclick: () => save() }, 'Enregistrer'),
       perRound
-        ? el('button', { class: 'btn', onclick: () => save().then(() => { round++; seed(); render() }) }, 'Manche suivante')
+        // la manche suivante est celle qui suit CELLE AFFICHÉE, pas la dernière
+        // enregistrée : sinon deux clics d'affilée reviennent au même endroit
+        ? el('button', { class: 'btn', onclick: () => goToRound(round + 1) }, 'Manche suivante')
         : null,
       el('button', { class: 'btn primary', onclick: () => save().then(finish) }, 'Terminer la partie'))
     applyRules()
+  }
+
+  const recordedRounds = () => Object.keys(st.entered).map(Number).sort((a, b) => a - b)
+  const lastRound = () => Math.max(0, ...recordedRounds())
+
+  /** Aller à une autre manche en conservant la saisie en cours : changer de
+   *  manche ne doit jamais faire perdre ce qui vient d'être tapé. */
+  async function goToRound(n) {
+    await save().catch(() => {})
+    round = n
+    seed()
+    render()
+  }
+
+  function roundPager() {
+    const done = recordedRounds()
+    const shown = done.includes(round) ? done : [...done, round].sort((a, b) => a - b)
+    const nav = el('div', { class: 'rounds' },
+      el('span', { class: 'tiny muted', style: 'margin-right:2px' }, 'Manches'),
+      shown.map(n => el('button', {
+        type: 'button', 'aria-current': String(n === round),
+        title: done.includes(n) ? `revenir à la manche ${n} pour la corriger` : 'manche en cours de saisie',
+        onclick: () => { if (n !== round) goToRound(n) }
+      }, String(n))))
+
+    if (done.includes(round))
+      nav.append(el('button', {
+        type: 'button', class: 'drop',
+        onclick: async () => {
+          const ok = await confirmAction({
+            title: `Supprimer la manche ${round} ?`,
+            body: done.length > round
+              ? `Les scores de cette manche seront effacés et les manches suivantes reculeront d'un cran. Cette action ne s'annule pas.`
+              : `Les scores de cette manche seront effacés. Cette action ne s'annule pas.`,
+            confirm: 'Supprimer', danger: true
+          })
+          if (!ok) return
+          try {
+            st = await api.dropRound(id, round, { expectedVersion: st.match.version, commandId: uuid() })
+            round = Math.max(1, lastRound())
+            seed(); render()
+            toast(`Manche supprimée`)
+          } catch (e) { toast(e.message, true) }
+        }
+      }, 'Supprimer cette manche'))
+
+    return nav
   }
 
   /** Les collections d'une page : celles qui alimentent une dérivation

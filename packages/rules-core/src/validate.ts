@@ -169,6 +169,7 @@ export function validate(b: Bundle): Issue[] {
   for (const sc of eng.scarcity ?? []) {
     const field = eng.modes.flatMap(m => m.inputs).find(f => f.id === sc.target)
     const col = eng.modes.flatMap(m => m.collections ?? []).find(c => c.id === sc.target)
+    if (sc.kind !== 'supply' && !sc.target) { err('EC-03', `limite « ${sc.id} » sans cible`); continue }
 
     if (!sc.message) err('EC-03', `limite de matériel « ${sc.id} » sans message affichable`)
     if (!sc.usedBy || (!targets.has(sc.usedBy) && !allDeriveTargets.has(sc.usedBy)))
@@ -176,15 +177,38 @@ export function validate(b: Bundle): Issue[] {
     if (sc.source === undefined || sc.source === null)
       warn('EC-05', `limite de matériel « ${sc.id} » sans source citée : une quantité affirmée sans livret est une invention`)
 
-    if (sc.kind === 'holders' || sc.kind === 'supply') {
+    if (sc.limit !== undefined && sc.limitExpr)
+      err('EC-03', `limite « ${sc.id} » déclare à la fois un plafond fixe et une expression : une seule forme`)
+    if (sc.limitExpr) {
+      const allowed = new Set<string>([...CORE_METRICS,
+        ...eng.modes.flatMap(m => m.inputs.filter(f => f.scope === 'GAME' || f.scope === 'ROUND').map(f => f.id))])
+      walk(sc.limitExpr, x => {
+        if ((x as any).op === 'ref' && !allowed.has((x as any).id))
+          err('EC-03', `plafond de « ${sc.id} » : « ${(x as any).id} » n'est ni une métrique de cœur ni un champ de portée table`)
+      })
+    }
+
+    if (sc.kind === 'holders') {
       if (!field) { err('EC-03', `limite « ${sc.id} » : le champ « ${sc.target} » n'existe dans aucun mode`); continue }
-      if (sc.kind === 'holders' && field.type !== 'BOOLEAN')
+      if (field.type !== 'BOOLEAN')
         err('EC-03', `limite « ${sc.id} » compte des détenteurs d'un champ ${field.type} : un booléen est attendu`)
-      if (sc.kind === 'supply' && field.type !== 'INTEGER')
-        err('EC-03', `limite « ${sc.id} » somme un champ ${field.type} : un entier est attendu`)
       if (!field.scope.startsWith('PARTICIPANT'))
         err('EC-03', `limite « ${sc.id} » porte sur un champ de portée ${field.scope} : le matériel se répartit entre participants`)
       if (sc.limit === undefined)
+        err('EC-03', `limite « ${sc.id} » sans plafond déclaré`)
+    } else if (sc.kind === 'supply') {
+      const sources = sc.targets ?? (sc.target ? [sc.target] : [])
+      if (!sources.length) err('EC-03', `limite « ${sc.id} » ne désigne aucune source à additionner`)
+      for (const t of sources) {
+        const f = eng.modes.flatMap(m => m.inputs).find(x => x.id === t)
+        const cl = eng.modes.flatMap(m => m.collections ?? []).find(x => x.id === t)
+        if (!f && !cl) { err('EC-03', `limite « ${sc.id} » : « ${t} » n'est ni un champ ni une collection`); continue }
+        if (f && f.type !== 'INTEGER')
+          err('EC-03', `limite « ${sc.id} » somme un champ ${f.type} : un entier est attendu`)
+        if (f && !f.scope.startsWith('PARTICIPANT'))
+          err('EC-03', `limite « ${sc.id} » porte sur un champ de portée ${f.scope} : le matériel se répartit entre participants`)
+      }
+      if (sc.limit === undefined && !sc.limitExpr)
         err('EC-03', `limite « ${sc.id} » sans plafond déclaré`)
     } else {
       if (!col) { err('EC-03', `limite « ${sc.id} » : la collection « ${sc.target} » n'est déclarée dans aucun mode`); continue }

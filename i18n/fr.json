@@ -59,6 +59,8 @@
   "ak.line.garden":            "Jardins",
   "ak.line.stones":            "Pierres",
   "ak.tb.stones":              "Cubes Pierre",
+  "ak.hexes":                  "Quartiers de la Cité",
+  "ak.scarcity.hexes":         "Une tuile Cité vaut 3 hexagones, et chaque Architecte en prend un nombre fixé par la configuration : une Cité ne peut pas contenir autant de Quartiers.",
   "ak.scarcity.stones":        "La boîte contient 40 cubes Pierre : la table ne peut pas en déclarer davantage.",
 
   "mc.solo":                   "Partie solo",

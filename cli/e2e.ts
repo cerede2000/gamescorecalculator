@@ -113,6 +113,9 @@ for (const file of readdirSync('fixtures').sort()) {
 
 // ── les refus que le serveur doit opposer ─────────────────────────────────
 console.log(b('Ce que le serveur refuse'))
+const okCase = async (label: string, fn: () => Promise<unknown>) => {
+  try { await fn(); ok(label, true) } catch (e: any) { ok(label, false, `— refusé : ${e.message}`) }
+}
 const refuse = async (label: string, fn: () => Promise<unknown>) => {
   try { await fn(); ok(label, false, '— accepté alors qu\'il fallait refuser') }
   catch { ok(label, true) }
@@ -195,9 +198,6 @@ await refuse('plus de 40 cubes Pierre sur la table', async () => {
   await put(st, { a: { values: { stones: 25 } }, b: { values: { stones: 20 } } })
 })
 
-const okCase = async (label: string, fn: () => Promise<unknown>) => {
-  try { await fn(); ok(label, true) } catch (e: any) { ok(label, false, `— refusé : ${e.message}`) }
-}
 await okCase('deux cartes 2 sur la table : le paquet en contient deux', async () => {
   const st = await f7()
   await put(st, {
@@ -243,6 +243,27 @@ await okCase('le paquet entier de bonus réparti entre deux joueurs', async () =
     b: { values: { busted: F, x2: F }, collections: { bonuses: [4, 6, 10] } }
   })
 })
+
+// ── le plafond qui dépend de la configuration ─────────────────────────────
+console.log()
+console.log(b('Une Cité ne peut pas contenir plus de Quartiers que la boîte'))
+{
+  const cite = (n: number) => ({ values: {}, collections: { housingLevels: [[1, n]] } })
+  const table = async (players: number, quartiers: number) => {
+    const st = await call('POST', '/api/matches', {
+      gameId: 'akropolis', mode: 'guided',
+      players: Array.from({ length: players }, (_, i) => ({ id: `p${i}`, name: `J${i + 1}` }))
+    })
+    await call('PUT', `/api/matches/${st.match.id}/rounds/1`, {
+      expectedVersion: st.match.version,
+      inputs: Object.fromEntries(Array.from({ length: players }, (_, i) => [`p${i}`, i === 0 ? cite(quartiers) : cite(1)]))
+    })
+  }
+  for (const [np, max] of [[2, 93], [3, 63], [4, 48]] as const) {
+    await okCase(`${np} joueurs : ${max} Quartiers passent`, () => table(np, max))
+    await refuse(`${np} joueurs : ${max + 1} Quartiers sont refusés`, () => table(np, max + 1))
+  }
+}
 
 // ── les règles atteignent la saisie ───────────────────────────────────────
 console.log()
@@ -302,6 +323,64 @@ console.log(b('Égalité à 200 : on joue une manche supplémentaire'))
   ok('et plus aucun avis d\'égalité', st.gameNotices.length === 0)
   ok('Ana l\'emporte 222 à 210',
      N(st.totals.a) === 222 && N(st.totals.b) === 210)
+}
+
+// ── corriger et supprimer une manche ──────────────────────────────────────
+console.log()
+console.log(b('Revenir sur une manche'))
+{
+  const mk = () => call('POST', '/api/matches', {
+    gameId: 'flip7', mode: 'express',
+    players: [{ id: 'a', name: 'Ana' }, { id: 'b', name: 'Bo' }]
+  })
+  const write = (st: any, n: number, ana: number) =>
+    call('PUT', `/api/matches/${st.match.id}/rounds/${n}`, {
+      expectedVersion: st.match.version,
+      inputs: {
+        a: { values: { busted: false, numberSum: ana, x2: false, bonusSum: 0, flip7: false } },
+        b: { values: { busted: false, numberSum: 1, x2: false, bonusSum: 0, flip7: false } }
+      }
+    })
+
+  let st = await mk()
+  st = await write(st, 1, 10)
+  st = await write(st, 2, 20)
+  st = await write(st, 3, 30)
+  ok('trois manches, cumul 60', N(st.totals.a) === 60)
+
+  // corriger une manche déjà saisie
+  st = await write(st, 2, 25)
+  ok('une manche se corrige sans en créer une nouvelle',
+     st.rounds.length === 3 && N(st.totals.a) === 65)
+
+  // supprimer celle du milieu
+  st = await call('DELETE', `/api/matches/${st.match.id}/rounds/2`, { expectedVersion: st.match.version })
+  ok('la manche du milieu disparaît', st.rounds.length === 2 && N(st.totals.a) === 40)
+  ok('et la numérotation se resserre : pas de manche 3 orpheline',
+     JSON.stringify(st.rounds.map((r: any) => r.round)) === '[1,2]')
+  ok('les scores restants sont les bons',
+     N(st.rounds[0].byParticipant.a.total) === 10 && N(st.rounds[1].byParticipant.a.total) === 30)
+
+  // le piège : deux manches créées d'affilée ne doivent pas retomber au même endroit
+  {
+    let m = await mk()
+    m = await write(m, 1, 10)
+    m = await write(m, 2, 20)
+    m = await write(m, 3, 30)
+    ok('trois manches successives restent trois manches distinctes',
+       m.rounds.length === 3 && N(m.totals.a) === 60,
+       `${m.rounds.length} manche(s), cumul ${N(m.totals.a)}`)
+  }
+
+  await refuse('supprimer une manche qui n\'existe pas',
+    () => call('DELETE', `/api/matches/${st.match.id}/rounds/9`, { expectedVersion: st.match.version }))
+
+  const closed = await call('POST', `/api/matches/${st.match.id}/finish`, { expectedVersion: st.match.version })
+  await refuse('supprimer une manche d\'une partie close',
+    () => call('DELETE', `/api/matches/${st.match.id}/rounds/1`, { expectedVersion: closed.match.version }))
+  const open2 = await call('POST', `/api/matches/${st.match.id}/reopen`, { expectedVersion: closed.match.version })
+  await okCase('après réouverture, la suppression redevient possible',
+    () => call('DELETE', `/api/matches/${st.match.id}/rounds/1`, { expectedVersion: open2.match.version }))
 }
 
 // ── idempotence ───────────────────────────────────────────────────────────

@@ -76,8 +76,17 @@ export type Scarcity = {
    *  copies  : chaque valeur de cette collection n'existe qu'en `byValue`
    *            exemplaires — une valeur absente de la table n'est pas limitée. */
   kind: 'holders' | 'supply' | 'copies'
-  target: string
+  target?: string
+  /** supply : plusieurs sources additionnées — champs entiers ou collections,
+   *  une collection comptant pour la somme de ses éléments. */
+  targets?: string[]
+  /** supply : 'table' (défaut) somme tous les participants ; 'each' plafonne
+   *  chacun séparément, ce qui est plus serré quand la dotation est par joueur. */
+  per?: 'table' | 'each'
   limit?: number
+  /** Le plafond dépend de la configuration : une expression du même langage,
+   *  évaluée sur les métriques de cœur et les champs de portée table. */
+  limitExpr?: Node
   byValue?: Record<string, number>
   usedBy: string
   message: string

@@ -224,3 +224,21 @@ input[type="text"], input[type="number"] {
 
 .overflow { overflow-x: auto; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ── confirmation ───────────────────────────────────────────────────────── */
+dialog.ask {
+  border: 1px solid var(--rule); border-radius: var(--r); background: var(--card); color: var(--ink);
+  padding: 0; max-width: 27rem; width: calc(100vw - 32px); box-shadow: var(--shadow);
+}
+dialog.ask .ask-body { padding: 20px 22px; }
+dialog.ask::backdrop { background: color-mix(in srgb, var(--ink) 46%, transparent); }
+dialog.ask h3 { margin: 0 0 6px; font-size: 17px; }
+dialog.ask p { margin: 0; }
+.btn.danger-solid { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+/* ── manches ────────────────────────────────────────────────────────────── */
+.rounds { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.rounds button { border: 1px solid var(--rule); background: var(--card); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-size: 14px; color: var(--ink-soft); }
+.rounds button[aria-current="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.rounds .add { border-style: dashed; }
+.rounds .drop { margin-left: auto; color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--rule)); }

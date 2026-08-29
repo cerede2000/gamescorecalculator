@@ -47,7 +47,7 @@ client, ni au noyau.
 npm test
 ```
 
-Cinq portes, 272 contrôles, aucune dépendance :
+Cinq portes, 287 contrôles, aucune dépendance :
 
 | Commande | Ce qu'elle prouve |
 |---|---|
@@ -97,16 +97,27 @@ Ce que chaque jeu y gagne :
 |---|---|---|
 | Flip 7 | éliminé → plus rien d'autre à saisir | carte N en N exemplaires, une carte 0, un ×2, un de chaque bonus, 30 points de bonus en tout, pas de doublon chez un joueur |
 | Moon Colony Bloodbath | solo ↔ multijoueur, variante longue, objectif atteint | rien de confirmé |
-| Akropolis | rien à masquer : les cinq catégories comptent toujours | 40 cubes Pierre |
+| Akropolis | rien à masquer : les cinq catégories comptent toujours | 40 cubes Pierre, et une Cité bornée par le nombre de tuiles en jeu |
 | Dune: Imperium | rien à masquer : un seul champ | rien de confirmé |
 
 **Le matériel est fini, et cela se déclare.** `scoringEngine.scarcity` porte
-trois formes : `holders` (au plus N joueurs tiennent ce champ), `supply` (la
-somme sur la table ne dépasse pas la réserve) et `copies` (chaque valeur d'une
-collection n'existe qu'en tant d'exemplaires). Une quantité affirmée sans
+trois formes : `holders` (au plus N joueurs tiennent ce champ), `supply` (une
+somme plafonnée, sur la table ou par joueur, sur un champ ou sur des
+collections entières) et `copies` (chaque valeur d'une collection n'existe
+qu'en tant d'exemplaires). Un plafond peut être **une expression** plutôt
+qu'un nombre, quand le matériel dépend de la configuration. Une quantité affirmée sans
 source déclenche un avertissement à la publication, et **une valeur dont le
 nombre d'exemplaires n'est pas déclaré n'est pas limitée** : l'oubli laisse
 passer, il ne bloque pas.
+
+Exemple du plafond calculé : une tuile Cité d'Akropolis vaut 3 hexagones, la
+boîte en contient 61, les piles en distribuent 3, 4 ou 5 selon le nombre de
+joueurs, la dernière tuile du Chantier n'est jamais jouée et la tuile de
+départ apporte 3 Quartiers — d'où 48 Quartiers au plus à 4 joueurs, 63 à 3 et
+93 à 2. À chaque fois la configuration la **plus généreuse** est retenue
+(partie longue comprise), pour qu'une limite ne puisse jamais refuser une
+table légale. La borne est large : elle attrape une faute de frappe, pas une
+erreur de comptage.
 
 Le serveur reste l'autorité : il revérifie la table entière à chaque
 enregistrement, et une valeur devenue sans objet ne compte plus comme du

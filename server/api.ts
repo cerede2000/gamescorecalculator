@@ -217,7 +217,9 @@ export function mount(app: Router, store: Store, cat: Catalogue, clientDir: stri
       const nameOf = (id: string) => names.get(id) ?? id
       const breaches = [
         ...Object.values(entries).flatMap(e => checkEntry(mode, e)),
-        ...checkRound(b, mode, entries, nameOf)
+        ...checkRound(b, mode, entries, nameOf, Object.fromEntries(
+          store.inputs(m.id).filter(r => r.round === round && r.participant_id === TABLE_SCOPE)
+            .map(r => [r.field_id, r.value === null ? null : parse(r.value)])))
       ]
       if (breaches.length) {
         const first = breaches[0]
@@ -234,14 +236,23 @@ export function mount(app: Router, store: Store, cat: Catalogue, clientDir: stri
 
   app.delete('/api/matches/:id/rounds/:round', (c: Ctx) => {
     const m = need(c.params.id)
+    const replay = idempotent(c, m.id)
+    if (replay) return replay
     guard(c, m.version)
+    if (m.status !== 'open') throw new HttpError(409, 'partie close — la rouvrir pour la modifier')
+
+    const round = Number(c.params.round)
+    const last = store.roundCount(m.id)
+    if (!Number.isInteger(round) || round < 1 || round > last)
+      throw new HttpError(404, `la manche ${c.params.round} n'existe pas`)
+
     const at = now()
     store.tx(() => {
-      store.dropRound(m.id, Number(c.params.round))
-      store.bumpVersion(m.id, m.version, at)
-      store.append(m.id, 'RoundDiscarded', { round: Number(c.params.round) }, at)
+      store.dropRound(m.id, round)
+      if (!store.bumpVersion(m.id, m.version, at)) throw new HttpError(409, 'partie modifiée entre-temps')
+      store.append(m.id, 'RoundDiscarded', { round, renumbered: last - round }, at)
     })
-    return state(m.id)
+    return remember(c, m.id, state(m.id))
   })
 
   // ── clôture, réouverture ──────────────────────────────────────────────────

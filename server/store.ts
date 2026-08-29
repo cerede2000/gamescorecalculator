@@ -184,9 +184,14 @@ export class Store {
     return Number(r.n)
   }
 
+  /** Supprime une manche et RESSERRE la numérotation : une partie ne saute
+   *  pas de la manche 1 à la manche 3. La manche n disparaît, les suivantes
+   *  reculent d'un cran — aucune collision de clé possible, la place est libre. */
   dropRound(matchId: string, round: number): void {
     this.db.prepare('DELETE FROM round_input WHERE match_id = ? AND round = ?').run(matchId, round)
     this.db.prepare('DELETE FROM round_collection WHERE match_id = ? AND round = ?').run(matchId, round)
+    this.db.prepare('UPDATE round_input SET round = round - 1 WHERE match_id = ? AND round > ?').run(matchId, round)
+    this.db.prepare('UPDATE round_collection SET round = round - 1 WHERE match_id = ? AND round > ?').run(matchId, round)
   }
 
   // ── départage ─────────────────────────────────────────────────────────────
